@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Canva Templates — DIGIVAULT</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='16' fill='%230ea5e9'/><text x='50%25' y='62%25' text-anchor='middle' font-size='52' font-weight='900' fill='%2303080f' font-family='Arial'>DV</text></svg>" />
+  <style>
+    .breadcrumb{max-width:1200px;margin:0 auto;padding:100px 5% 0;display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--text-muted)}
+    .breadcrumb a{color:var(--text-muted);text-decoration:none;transition:color .3s}.breadcrumb a:hover{color:var(--amber)}.breadcrumb .sep{opacity:.4}.breadcrumb .cur{color:var(--cream)}
+    .company-wrap{max-width:1200px;margin:28px auto 0;padding:0 5%}
+    .company-block{background:linear-gradient(135deg,rgba(4,8,4,0.97),rgba(10,14,10,0.98));border:1.5px solid rgba(255,255,255,0.14);border-radius:22px;display:grid;grid-template-columns:1fr 1.1fr;overflow:hidden;cursor:pointer;transition:border-color .3s,box-shadow .3s,transform .3s;position:relative}
+    .company-block::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.03),transparent 60%);opacity:0;transition:opacity .3s}
+    .company-block:hover{border-color:rgba(255,255,255,0.32);box-shadow:0 20px 56px rgba(0,0,0,0.7);transform:translateY(-3px)}
+    .company-block:hover::before{opacity:1}
+    .cb-left{padding:40px;display:flex;flex-direction:column;justify-content:center;position:relative;z-index:2}
+    .cb-badge{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:100px;padding:5px 14px;font-size:.65rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.9);margin-bottom:16px;width:fit-content}
+    .cb-title{font-family:'Bebas Neue',sans-serif;font-size:1.9rem;letter-spacing:.04em;color:#ffffff;line-height:1.1;margin-bottom:10px}
+    .cb-desc{font-size:.85rem;color:rgba(255,255,255,.55);line-height:1.72;margin-bottom:20px;max-width:340px}
+    .cb-tags{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px}
+    .cb-tag{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16);border-radius:6px;padding:4px 11px;font-size:.7rem;color:rgba(255,255,255,.8)}
+    .cb-btn{display:inline-flex;align-items:center;gap:7px;background:#ffffff;color:#0a0a0a;border:none;border-radius:10px;padding:12px 26px;font-weight:700;font-size:.88rem;cursor:pointer;transition:opacity .2s,transform .2s;width:fit-content;text-decoration:none}
+    .cb-btn:hover{opacity:.88;transform:translateY(-1px)}
+    .cb-right{position:relative;overflow:hidden;padding:28px}
+    .cb-right::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.03),transparent)}
+    .cb-preview-card{position:absolute;background:linear-gradient(145deg,rgba(20,24,20,0.96),rgba(10,12,10,0.98));border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:13px 16px;width:155px;box-shadow:0 10px 28px rgba(0,0,0,.5);z-index:1;transition:transform .3s}
+    .cb-preview-card:nth-child(1){top:20px;right:75px;transform:rotate(2.5deg)}
+    .cb-preview-card:nth-child(2){top:70px;right:22px;transform:rotate(-2deg);z-index:3}
+    .cb-preview-card:nth-child(3){bottom:24px;right:65px;transform:rotate(1.5deg);z-index:2}
+    .company-block:hover .cb-preview-card:nth-child(1){transform:rotate(2.5deg) translateY(-4px)}
+    .company-block:hover .cb-preview-card:nth-child(2){transform:rotate(-2deg) translateY(-6px)}
+    .company-block:hover .cb-preview-card:nth-child(3){transform:rotate(1.5deg) translateY(-2px)}
+    .pcard-icon{font-size:1.4rem;margin-bottom:6px}.pcard-name{font-family:'Bebas Neue',sans-serif;font-size:.88rem;letter-spacing:.05em;color:#ffffff;margin-bottom:3px}.pcard-rank{font-size:.68rem;color:rgba(255,255,255,0.5);margin-bottom:6px}.pcard-price{font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--amber);letter-spacing:.04em}
+    .section-label{max-width:1200px;margin:36px auto 16px;padding:0 5%;display:flex;align-items:center;gap:14px}
+    .section-label h3{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.08em;color:var(--cream);white-space:nowrap}
+    .sl-line{flex:1;height:1px;background:rgba(255,255,255,.06)}
+    .filter-bar{max-width:1200px;margin:28px auto 0;padding:0 5%;display:flex;gap:10px;flex-wrap:wrap}
+    .filter-select{background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.1);border-radius:var(--radius-sm);padding:9px 14px;font-size:.82rem;color:var(--cream);outline:none;font-family:'DM Sans',sans-serif;cursor:pointer;transition:var(--transition);appearance:none;min-width:155px}
+    .filter-select:focus{border-color:var(--amber)}
+    .listings-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(248px,1fr));gap:20px;max-width:1200px;margin:0 auto;padding:0 5% 80px}
+    @media(max-width:768px){.company-block{grid-template-columns:1fr}.cb-left{padding:28px 22px}.cb-right{display:none}.listings-grid{grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}}
+    @media(max-width:480px){.company-block{border-radius:14px}.cb-left{padding:22px 18px}.cb-title{font-size:1.5rem}.cb-btn{padding:10px 20px;font-size:.82rem}.filter-bar{flex-direction:column;align-items:stretch}.filter-select{width:100%}.listings-grid{grid-template-columns:1fr 1fr;gap:12px;padding:0 4% 60px}.breadcrumb{padding-top:90px;font-size:.72rem}}
+
+    /* Dark seller cards */
+    #listingsGrid .account-card {
+      background: rgba(10,13,10,0.88);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-top: 3px solid rgba(14,165,233,0.4);
+      transition: var(--transition);
+    }
+    #listingsGrid .account-card:hover {
+      border-color: rgba(255,255,255,0.16);
+      border-top-color: var(--amber);
+      transform: translateY(-4px);
+      box-shadow: 0 14px 40px rgba(0,0,0,0.55);
+    }
+    #listingsGrid .ac-img {
+      background: linear-gradient(135deg, rgba(20,24,20,0.9), rgba(8,10,8,0.98));
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    #listingsGrid .ac-name { color: #ffffff; }
+    #listingsGrid .ac-meta span { color: rgba(255,255,255,0.55); }
+  </style>
+</head>
+<body>
+  <nav class="navbar" role="navigation">
+    <a href="index.html" class="nav-logo">
+      <div class="logo-icon" style="font-family:'Bebas Neue',sans-serif;font-size:.78rem;font-weight:900;letter-spacing:.04em;">DV</div>
+      DIGI<span>VAULT</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="index.html#contact">Contact</a></li>
+      <li><a href="market.html">Marketplace</a></li>
+    </ul>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <button onclick="openAccountPage()" title="My Account" style="width:40px;height:40px;border-radius:50%;background:rgba(14,165,233,.12);border:1.5px solid rgba(14,165,233,.32);display:flex;align-items:center;justify-content:center;font-size:1.15rem;cursor:pointer;transition:var(--transition);flex-shrink:0;" onmouseover="this.style.background='rgba(14,165,233,.22)';this.style.borderColor='var(--amber)'" onmouseout="this.style.background='rgba(14,165,233,.12)';this.style.borderColor='rgba(14,165,233,.32)'">👤</button>
+      <div id="lang-switcher"></div>
+      <button class="hamburger" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+  <nav class="mobile-menu">
+    <a href="index.html">Home</a>
+    <a href="index.html#contact">Contact</a>
+    <a href="market.html">Marketplace</a>
+    <a href="javascript:openAccountPage()">👤 My Account</a>
+  </nav>
+
+  <main>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a><span class="sep">/</span>
+      <a href="market.html">Marketplace</a><span class="sep">/</span>
+      <span class="cur">🎨 Canva Templates</span>
+    </div>
+    <div style="max-width:1200px;margin:24px auto 0;padding:0 5%;">
+      <h1 class="section-title" style="font-size:clamp(1.8rem,4.5vw,3.2rem);margin-bottom:6px;">Canva Templates</h1>
+      <p style="font-size:.88rem;color:var(--text-muted);">Social media · Presentations · Brand kits · Fully editable designs</p>
+    </div>
+
+    <div class="company-wrap">
+      <div class="company-block reveal" onclick="window.location.href='company.html'">
+        <div class="cb-left">
+          <div class="cb-badge">🏢 Official · Verified</div>
+          <div class="cb-title">Company Design Pack</div>
+          <div class="cb-desc">100+ premium Canva templates designed by our creative team. Social media, presentations, business — all fully editable and multi-platform ready.</div>
+          <div class="cb-tags">
+            <span class="cb-tag">100+ Designs</span>
+            <span class="cb-tag">✏️ Fully Editable</span>
+            <span class="cb-tag">📱 All Platforms</span>
+          </div>
+          <a href="company.html" class="cb-btn" onclick="event.stopPropagation()">View Company Pack →</a>
+        </div>
+        <div class="cb-right">
+          <div class="cb-preview-card"><div class="pcard-icon">🎨</div><div class="pcard-name">Design Mega Pack</div><div class="pcard-rank">Canva · 100+ Designs</div><div class="pcard-price">75,000 IQD</div></div>
+          <div class="cb-preview-card"><div class="pcard-icon">📱</div><div class="pcard-name">Story Pack Pro</div><div class="pcard-rank">Canva · 30 Stories</div><div class="pcard-price">45,000 IQD</div></div>
+          <div class="cb-preview-card"><div class="pcard-icon">📊</div><div class="pcard-name">Business Pitch</div><div class="pcard-rank">Canva · 20 Slides</div><div class="pcard-price">65,000 IQD</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="filter-bar reveal">
+      <select class="filter-select" id="priceFilter" onchange="applyFilters()">
+        <option value="all">All Prices</option>
+        <option value="low">Under 50K IQD</option>
+        <option value="mid">50K – 100K IQD</option>
+        <option value="high">100K+ IQD</option>
+      </select>
+    </div>
+
+    <div class="section-label reveal" style="margin-top:32px;">
+      <h3>🛒 Community Listings</h3><div class="sl-line"></div>
+    </div>
+
+    <div class="listings-grid" id="listingsGrid">
+      <article class="account-card reveal" data-price="65000">
+        <div class="ac-img">📊<span class="ac-level">Canva</span></div>
+        <div class="ac-body"><h3 class="ac-name">Business Pitch Deck</h3><div class="ac-meta"><span>📊 20 Slides</span><span>🎨 Editable</span></div><div style="display:flex;align-items:baseline;gap:5px;"><span class="ac-price">65,000</span><span class="ac-price-label">IQD</span></div></div>
+        <div class="ac-footer"><button class="btn btn-primary" style="width:100%;justify-content:center;padding:10px;" onclick="goView('📊','Business Pitch Deck','65,000 IQD','Canva · 20 Slides · Modern','Pitch deck with editable charts, icons, and color themes.','🎨 Canva Template','📊 20 Slides','CANVA002','N/A','N/A')">View</button></div>
+      </article>
+      <article class="account-card reveal reveal-delay-1" data-price="38000">
+        <div class="ac-img">📱<span class="ac-level">IG</span></div>
+        <div class="ac-body"><h3 class="ac-name">Social Media Bundle</h3><div class="ac-meta"><span>📱 50 Templates</span><span>🎨 All Platforms</span></div><div style="display:flex;align-items:baseline;gap:5px;"><span class="ac-price">38,000</span><span class="ac-price-label">IQD</span></div></div>
+        <div class="ac-footer"><button class="btn btn-primary" style="width:100%;justify-content:center;padding:10px;" onclick="goView('📱','Social Media Bundle','38,000 IQD','Canva · 50 Templates · All platforms','50-template pack, Instagram/Facebook/TikTok.','🎨 Canva Template','📱 50 Templates','CANVA003','N/A','N/A')">View</button></div>
+      </article>
+      <article class="account-card reveal reveal-delay-2" data-price="52000">
+        <div class="ac-img">🎯<span class="ac-level">Brand</span></div>
+        <div class="ac-body"><h3 class="ac-name">Brand Kit Pro</h3><div class="ac-meta"><span>🎯 Full Branding</span><span>🎨 Logos + Colors</span></div><div style="display:flex;align-items:baseline;gap:5px;"><span class="ac-price">52,000</span><span class="ac-price-label">IQD</span></div></div>
+        <div class="ac-footer"><button class="btn btn-primary" style="width:100%;justify-content:center;padding:10px;" onclick="goView('🎯','Brand Kit Pro','52,000 IQD','Canva · Full Brand Kit','Logo variants, color palettes, typography, social templates.','🎨 Canva Template','🎯 Brand Kit','CANVA004','N/A','N/A')">View</button></div>
+      </article>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-bottom">
+        <p class="footer-copy">© 2025 DIGIVAULT. All rights reserved.</p>
+        <div class="footer-social"><a href="#" class="social-btn">💬</a><a href="#" class="social-btn">✈️</a><a href="#" class="social-btn">𝕏</a></div>
+      </div>
+    </div>
+    <div id="lang-switcher"></div>
+  </footer>
+
+  <script src="i18n.js"></script>
+  <script src="script.js"></script>
+  <script src="api.js"></script>
+  <script src="dashboard.js"></script>
+  <script>
+    async function loadListings() {
+      var grid = document.getElementById('listingsGrid');
+      grid.innerHTML = '<p style="padding:30px 5%;color:var(--text-muted);">Loading listings…</p>';
+      try {
+        var params = { category: 'canva_template', status: 'active', sort: 'newest' };
+        var priceVal = document.getElementById('priceFilter') ? document.getElementById('priceFilter').value : 'all';
+        
+        if (priceVal === 'low')  params.maxPrice = 49999;
+        if (priceVal === 'mid')  { params.minPrice = 50000; params.maxPrice = 100000; }
+        if (priceVal === 'high') params.minPrice = 100001;
+        var data = await DVAPI.Products.getAll(params);
+        if (!data.products.length) {
+          grid.innerHTML = '<p style="padding:30px 5%;color:var(--text-muted);">No listings yet. Be the first to sell!</p>';
+          return;
+        }
+        grid.innerHTML = data.products.map(function(p) {
+          var imgHTML = (p.images && p.images.length)
+            ? '<img src="' + p.images[0].url + '" alt="' + p.title + '" style="width:100%;height:100%;object-fit:cover;">'
+            : '🖼️';
+          var tag = (p.tags && p.tags[0]) ? p.tags[0] : '';
+          return '<article class="account-card reveal" data-price="' + p.price + '">' +
+            '<div class="ac-img">' + imgHTML + '<span class="ac-level">' + tag + '</span></div>' +
+            '<div class="ac-body">' +
+              '<h3 class="ac-name">' + p.title + '</h3>' +
+              '<div class="ac-meta"><span>👤 ' + (p.createdBy && p.createdBy.username ? p.createdBy.username : 'Seller') + '</span><span>👁 ' + (p.views||0) + '</span></div>' +
+              '<div style="display:flex;align-items:baseline;gap:5px;"><span class="ac-price">' + p.price.toLocaleString() + '</span><span class="ac-price-label">IQD</span></div>' +
+            '</div>' +
+            '<div class="ac-footer"><button class="btn btn-primary" style="width:100%;justify-content:center;padding:10px;" onclick="goView(\'' + p._id + '\')">View</button></div>' +
+          '</article>';
+        }).join('');
+      } catch(err) {
+        grid.innerHTML = '<p style="padding:30px 5%;color:#f87171;">Could not load listings: ' + err.message + '</p>';
+      }
+    }
+    function goView(id) { window.location.href = 'view.html?id=' + id; }
+    function applyFilters() { loadListings(); }
+    loadListings();
+  </script>
+</body>
+</html>

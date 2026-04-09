@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Post Game Account — DIGIVAULT</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='16' fill='%230ea5e9'/><text x='50%25' y='62%25' text-anchor='middle' font-size='52' font-weight='900' fill='%2303080f' font-family='Arial'>DV</text></svg>"/>
+  <style>
+    .post-wrap{max-width:760px;margin:0 auto;padding:110px 5% 80px;}
+    .post-back{display:inline-flex;align-items:center;gap:8px;color:var(--text-muted);font-size:.82rem;font-weight:600;text-decoration:none;margin-bottom:24px;transition:var(--transition);}
+    .post-back:hover{color:var(--amber);}
+    .post-hero{margin-bottom:32px;}
+    .post-hero-tag{font-size:.65rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+    .post-hero-tag::before{content:'';display:block;width:18px;height:2px;background:var(--amber);border-radius:2px;}
+    .post-hero h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(1.8rem,4vw,2.6rem);letter-spacing:.04em;color:var(--cream);margin-bottom:6px;}
+    .post-hero p{font-size:.85rem;color:var(--text-muted);}
+
+    .post-form{background:var(--card-bg);border:1px solid var(--card-bdr);border-radius:20px;padding:32px;display:flex;flex-direction:column;gap:20px;}
+    .pf-section{border-bottom:1px solid rgba(255,255,255,.05);padding-bottom:20px;}
+    .pf-section:last-of-type{border-bottom:none;padding-bottom:0;}
+    .pf-section-title{font-family:'Bebas Neue',sans-serif;font-size:.95rem;letter-spacing:.08em;color:var(--amber);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+    .pf-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+    .pf-group{display:flex;flex-direction:column;gap:6px;}
+    .pf-lbl{font-size:.69rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);}
+    .pf-inp,.pf-sel,.pf-ta{background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.09);border-radius:9px;padding:11px 14px;font-size:.9rem;color:var(--cream);outline:none;font-family:'DM Sans',sans-serif;transition:var(--transition);width:100%;}
+    .pf-inp:focus,.pf-sel:focus,.pf-ta:focus{border-color:var(--amber);background:rgba(14,165,233,.04);}
+    .pf-inp::placeholder,.pf-ta::placeholder{color:rgba(255,255,255,.22);}
+    .pf-sel{appearance:none;}
+    .pf-ta{resize:vertical;min-height:100px;}
+
+    /* Price row */
+    .price-row{display:flex;gap:0;align-items:stretch;}
+    .price-prefix{background:rgba(14,165,233,.1);border:1.5px solid rgba(14,165,233,.22);border-radius:9px 0 0 9px;padding:11px 14px;font-size:.82rem;color:var(--amber);font-weight:700;display:flex;align-items:center;border-right:none;white-space:nowrap;}
+    .price-input{flex:1;border-radius:0 9px 9px 0!important;}
+
+    /* Image upload zone */
+    .upload-zone{border:2px dashed rgba(14,165,233,.25);border-radius:12px;padding:28px;text-align:center;cursor:pointer;transition:var(--transition);position:relative;overflow:hidden;}
+    .upload-zone:hover{border-color:var(--amber);background:rgba(14,165,233,.04);}
+    .upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+    .upload-icon{font-size:2.2rem;margin-bottom:10px;}
+    .upload-text{font-size:.86rem;color:var(--text-muted);}
+    .upload-hint{font-size:.73rem;color:rgba(255,255,255,.25);margin-top:4px;}
+
+    /* Image previews */
+    .img-previews{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;}
+    .img-thumb{position:relative;width:80px;height:80px;border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,.1);}
+    .img-thumb img{width:100%;height:100%;object-fit:cover;}
+    .img-thumb-remove{position:absolute;top:3px;right:3px;background:rgba(0,0,0,.7);border:none;border-radius:50%;width:18px;height:18px;color:#fff;font-size:.65rem;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+
+    /* File preview items */
+    .file-preview-item{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:6px 11px;font-size:.78rem;color:var(--text-muted);}
+    .file-preview-item button{background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer;font-size:.8rem;padding:0;margin-left:4px;}
+    .file-preview-item button:hover{color:#ef4444;}
+
+    /* Video error */
+    .vid-error{font-size:.73rem;color:#ef4444;margin-top:5px;display:none;}
+
+    /* Negotiable toggle */
+    .toggle-row{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:13px 15px;}
+    .toggle-label{font-size:.87rem;color:var(--cream);font-weight:500;}
+    .toggle-sub{font-size:.73rem;color:var(--text-muted);}
+    .toggle-switch{position:relative;width:44px;height:24px;flex-shrink:0;}
+    .toggle-switch input{opacity:0;width:0;height:0;}
+    .toggle-slider{position:absolute;inset:0;background:rgba(255,255,255,.12);border-radius:100px;cursor:pointer;transition:.3s;}
+    .toggle-slider::before{content:'';position:absolute;width:18px;height:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.3s;}
+    .toggle-switch input:checked + .toggle-slider{background:var(--amber);}
+    .toggle-switch input:checked + .toggle-slider::before{transform:translateX(20px);}
+
+    /* Submit */
+    .post-submit-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap;}
+    .btn-submit{flex:1;padding:14px 24px;background:linear-gradient(135deg,#0ea5e9,#0284c7);border:none;border-radius:11px;color:#fff;font-size:.95rem;font-weight:700;cursor:pointer;transition:var(--transition);box-shadow:0 4px 18px rgba(14,165,233,.32);}
+    .btn-submit:hover{background:linear-gradient(135deg,#38bdf8,#0ea5e9);transform:translateY(-1px);}
+    .btn-draft{padding:14px 24px;background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.1);border-radius:11px;color:var(--text-muted);font-size:.88rem;font-weight:600;cursor:pointer;transition:var(--transition);}
+    .btn-draft:hover{border-color:rgba(255,255,255,.25);color:var(--cream);}
+
+    /* Hidden fields */
+    .field-hidden{display:none!important;}
+
+    /* Light mode */
+    body.light-mode .post-form{background:rgba(255,255,255,.9)!important;border-color:rgba(14,165,233,.18)!important;}
+    body.light-mode .pf-section{border-bottom-color:rgba(14,165,233,.1)!important;}
+    body.light-mode .pf-lbl{color:#475569!important;}
+    body.light-mode .pf-inp,body.light-mode .pf-sel,body.light-mode .pf-ta{background:#fff!important;border-color:rgba(14,165,233,.22)!important;color:#0c1a2e!important;}
+    body.light-mode .pf-inp::placeholder,body.light-mode .pf-ta::placeholder{color:#94a3b8!important;}
+    body.light-mode .post-hero h1{color:#0c1a2e!important;}
+    body.light-mode .post-hero p{color:#475569!important;}
+    body.light-mode .toggle-row{background:rgba(14,165,233,.05)!important;border-color:rgba(14,165,233,.14)!important;}
+    body.light-mode .toggle-label{color:#0c1a2e!important;}
+    body.light-mode .toggle-sub{color:#475569!important;}
+    body.light-mode .upload-zone{border-color:rgba(14,165,233,.3)!important;}
+    body.light-mode .upload-text{color:#475569!important;}
+
+    @media(max-width:600px){
+      .pf-row{grid-template-columns:1fr;}
+      .post-submit-row{flex-direction:column;}
+      .btn-submit,.btn-draft{width:100%;}
+    }
+  </style>
+</head>
+<body>
+<nav class="navbar" role="navigation">
+  <a href="index.html" class="nav-logo">
+    <div class="logo-icon" style="font-family:'Bebas Neue',sans-serif;font-size:.78rem;font-weight:900;letter-spacing:.04em;">DV</div>
+    DIGI<span>VAULT</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="market.html">Marketplace</a></li>
+    <li><a href="account.html">My Account</a></li>
+  </ul>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <button onclick="openAccountPage()" title="My Account" style="width:38px;height:38px;border-radius:50%;background:rgba(14,165,233,.12);border:1.5px solid rgba(14,165,233,.3);display:flex;align-items:center;justify-content:center;font-size:1.1rem;cursor:pointer;transition:var(--transition);">👤</button>
+    <div id="lang-switcher"></div>
+    <button class="hamburger"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+<nav class="mobile-menu">
+  <a href="index.html">Home</a>
+  <a href="market.html">Marketplace</a>
+  <a href="account.html">My Account</a>
+</nav>
+
+<div class="post-wrap">
+  <a href="account.html" class="post-back">← Back to Dashboard</a>
+
+  <div class="post-hero">
+    <div class="post-hero-tag">Post a Listing · Game Account</div>
+    <h1>🎮 List Your Game Account</h1>
+    <p>Fill in the details below. Your listing will be reviewed and published within a few hours.</p>
+  </div>
+
+  <div class="post-form">
+
+    <!-- ── GAME CATEGORY ── -->
+    <div class="pf-section">
+      <div class="pf-section-title">🎯 Game Category</div>
+      <div class="pf-row">
+        <div class="pf-group">
+          <label class="pf-lbl">Game *</label>
+          <select class="pf-sel" id="gameType" onchange="onGameChange()">
+            <option value="" disabled selected>Select game…</option>
+            <option value="pubg">PUBG Mobile</option>
+            <option value="ea">EA Football (FC)</option>
+            <option value="cr">Clash Royale</option>
+            <option value="fn">Fortnite</option>
+            <option value="other">Other Game</option>
+          </select>
+        </div>
+        <div class="pf-group">
+          <label class="pf-lbl">Platform *</label>
+          <select class="pf-sel" id="platform">
+            <option value="mobile">Mobile</option>
+            <option value="pc">PC</option>
+            <option value="console">Console</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PUBG-SPECIFIC FIELDS ── -->
+    <div class="pf-section" id="section-pubg">
+      <div class="pf-section-title">⚡ Account Details</div>
+
+      <div class="pf-row" style="margin-bottom:14px;">
+        <div class="pf-group">
+          <label class="pf-lbl" id="lbl-account-id">Account ID *</label>
+          <input class="pf-inp" type="text" id="accountId" placeholder="Enter your PUBG Account ID"/>
+        </div>
+        <div class="pf-group">
+          <label class="pf-lbl" id="lbl-level">Account Level (1–100) *</label>
+          <input class="pf-inp" type="number" id="accountLevel" min="1" max="100" placeholder="e.g. 72"/>
+        </div>
+      </div>
+
+      <div class="pf-row" style="margin-bottom:14px;">
+        <div class="pf-group">
+          <label class="pf-lbl">Collection (1–100)</label>
+          <input class="pf-inp" type="number" id="collection" min="1" max="100" placeholder="e.g. 45"/>
+        </div>
+        <!-- Linked Account — PUBG only -->
+        <div class="pf-group" id="field-linked">
+          <label class="pf-lbl">Linked Account</label>
+          <select class="pf-sel" id="linkedAccount">
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="pf-row">
+        <div class="pf-group">
+          <label class="pf-lbl">Location *</label>
+          <select class="pf-sel" id="location">
+            <option value="" disabled selected>Select city…</option>
+            <option value="hawler">Hawler (Erbil)</option>
+            <option value="sulaymaniyah">Sulaymaniyah</option>
+            <option value="duhok">Duhok</option>
+            <option value="kirkuk">Kirkuk</option>
+            <option value="baghdad">Baghdad</option>
+            <option value="mosul">Mosul</option>
+          </select>
+        </div>
+        <div class="pf-group">
+          <label class="pf-lbl">Address (Optional)</label>
+          <input class="pf-inp" type="text" id="address" placeholder="e.g. Ankawa, Erbil"/>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── MEDIA: IMAGES ── -->
+    <div class="pf-section">
+      <div class="pf-section-title">🖼️ Screenshots (Max 6)</div>
+      <div class="upload-zone" id="imgUploadZone">
+        <input type="file" accept="image/*" multiple id="screenshots" onchange="handleImages(this)"/>
+        <div class="upload-icon">📸</div>
+        <div class="upload-text">Drop screenshots here or click to upload</div>
+        <div class="upload-hint">PNG, JPG · Max 5 MB each · Up to 6 images</div>
+      </div>
+      <div class="img-previews" id="imgPreviews"></div>
+    </div>
+
+    <!-- ── MEDIA: VIDEO ── -->
+    <div class="pf-section">
+      <div class="pf-section-title">🎥 Preview Video (Optional — Max 2 Minutes)</div>
+      <div class="upload-zone">
+        <input type="file" accept="video/*" id="videoFile" onchange="handleVideo(this)"/>
+        <div class="upload-icon">🎬</div>
+        <div class="upload-text">Click to upload a video (max 2 min)</div>
+        <div class="upload-hint">MP4, MOV · Max 100 MB</div>
+      </div>
+      <div id="videoPreview" style="margin-top:10px;"></div>
+      <div class="vid-error" id="vidError">⚠️ Video exceeds 2 minutes. Please upload a shorter clip.</div>
+    </div>
+
+    <!-- ── DESCRIPTION ── -->
+    <div class="pf-section">
+      <div class="pf-section-title">📝 Description (Optional)</div>
+      <div class="pf-group">
+        <textarea class="pf-ta" id="description" rows="4" placeholder="Describe your account — rank, skins, items, or anything special buyers should know…"></textarea>
+      </div>
+    </div>
+
+    <!-- ── CONTACT ── -->
+    <div class="pf-section">
+      <div class="pf-section-title">📬 Contact Method</div>
+      <div class="pf-row">
+        <div class="pf-group">
+          <label class="pf-lbl">WhatsApp Number</label>
+          <input class="pf-inp" type="tel" id="contactWhatsapp" placeholder="e.g. +964 750 000 0000"/>
+          <div style="font-size:.7rem;color:var(--text-muted);margin-top:4px;">Include country code, digits only.</div>
+        </div>
+        <div class="pf-group">
+          <label class="pf-lbl">Telegram Username / Link</label>
+          <input class="pf-inp" type="text" id="contactTelegram" placeholder="e.g. @username or t.me/username"/>
+        </div>
+      </div>
+      <div style="font-size:.72rem;color:var(--text-muted);margin-top:6px;">At least one contact method is required.</div>
+    </div>
+
+    <!-- ── PRICE ── -->
+    <div class="pf-section">
+      <div class="pf-section-title">💰 Pricing</div>
+      <div class="pf-group" style="margin-bottom:14px;">
+        <label class="pf-lbl">Asking Price (IQD) *</label>
+        <div class="price-row">
+          <div class="price-prefix">IQD</div>
+          <input class="pf-inp price-input" type="number" id="price" placeholder="e.g. 450000"/>
+        </div>
+      </div>
+      <div class="toggle-row">
+        <div>
+          <div class="toggle-label">Price is Negotiable</div>
+          <div class="toggle-sub">Allow buyers to make offers</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="negotiable" checked/>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- ── SUBMIT ── -->
+    <div class="post-submit-row">
+      <button class="btn-submit" onclick="submitListing()">🚀 Publish Listing</button>
+      <button class="btn-draft" onclick="saveDraft()">💾 Save as Draft</button>
+    </div>
+
+  </div><!-- /post-form -->
+</div><!-- /post-wrap -->
+
+<script src="i18n.js"></script>
+<script src="script.js"></script>
+<script src="api.js"></script>
+<script src="global.js"></script>
+<script src="dashboard.js"></script>
+<script>
+  'use strict';
+
+  /* ── Toast fallback ── */
+  if (typeof showToast === 'undefined') {
+    window.showToast = function(t, m) {
+      var el = document.createElement('div');
+      el.style.cssText = 'position:fixed;bottom:26px;right:22px;background:linear-gradient(135deg,#0e1f38,#152840);border:1px solid rgba(14,165,233,.4);border-radius:12px;padding:13px 18px;color:#e0f2fe;font-size:.83rem;z-index:9999;box-shadow:0 8px 28px rgba(0,0,0,.5);max-width:290px;font-family:DM Sans,sans-serif;';
+      el.innerHTML = '<strong style="color:#38bdf8;display:block;margin-bottom:3px;">' + t + '</strong>' + m;
+      document.body.appendChild(el);
+      setTimeout(function(){ el.remove(); }, 3400);
+    };
+  }
+
+  /* ── Auth guard ── */
+  if (!localStorage.getItem('tw_user')) { window.location.replace('login.html'); }
+
+  /* ── Image files state ── */
+  var imageFiles = [];
+
+  /* ── Game-dependent label / field logic ── */
+  function onGameChange() {
+    var game        = document.getElementById('gameType').value;
+    var lblId       = document.getElementById('lbl-account-id');
+    var lblLvl      = document.getElementById('lbl-level');
+    var fieldLinked = document.getElementById('field-linked');
+
+    if (game === 'pubg') {
+      lblId.textContent  = 'Account ID *';
+      lblLvl.textContent = 'Account Level (1–100) *';
+      document.getElementById('accountId').placeholder = 'Enter your PUBG Account ID';
+      fieldLinked.classList.remove('field-hidden');
+    } else if (game === 'ea') {
+      lblId.textContent  = 'Account Name *';
+      lblLvl.textContent = 'Division / Level *';
+      document.getElementById('accountId').placeholder = 'Enter your EA FC account name';
+      fieldLinked.classList.add('field-hidden');
+    } else if (game === 'cr') {
+      lblId.textContent  = 'Account Name *';
+      lblLvl.textContent = 'King Level (1–60) *';
+      document.getElementById('accountId').placeholder = 'Enter your Clash Royale name';
+      fieldLinked.classList.add('field-hidden');
+    } else if (game === 'fn') {
+      lblId.textContent  = 'Account Name *';
+      lblLvl.textContent = 'Battle Pass Level *';
+      document.getElementById('accountId').placeholder = 'Enter your Fortnite username';
+      fieldLinked.classList.add('field-hidden');
+    } else {
+      lblId.textContent  = 'Account Name *';
+      lblLvl.textContent = 'Account Level *';
+      document.getElementById('accountId').placeholder = 'Enter your account name or ID';
+      fieldLinked.classList.add('field-hidden');
+    }
+  }
+
+  /* ── Image upload: max 6 with visual previews ── */
+  function handleImages(input) {
+    var files     = Array.from(input.files);
+    var remaining = 6 - imageFiles.length;
+
+    if (files.length > remaining) {
+      files = files.slice(0, remaining);
+      if (remaining === 0) {
+        showToast('⚠️ Max 6 Images', 'You have already uploaded 6 images.');
+        input.value = '';
+        return;
+      }
+      showToast('⚠️ Max 6 Images', 'Only ' + remaining + ' more image(s) added.');
+    }
+
+    files.forEach(function(file) {
+      if (!file.type.startsWith('image/')) return;
+      imageFiles.push(file);
+
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var container = document.getElementById('imgPreviews');
+        var thumb = document.createElement('div');
+        thumb.className = 'img-thumb';
+        thumb.dataset.name = file.name;
+
+        var img = document.createElement('img');
+        img.src = e.target.result;
+        img.alt = 'preview';
+
+        var removeBtn = document.createElement('button');
+        removeBtn.className = 'img-thumb-remove';
+        removeBtn.textContent = '✕';
+        removeBtn.addEventListener('click', function(){ removeImage(file.name, thumb); });
+
+        thumb.appendChild(img);
+        thumb.appendChild(removeBtn);
+        container.appendChild(thumb);
+      };
+      reader.readAsDataURL(file);
+    });
+
+    /* Reset so same file can be re-added after removal */
+    input.value = '';
+  }
+
+  function removeImage(name, thumbEl) {
+    imageFiles = imageFiles.filter(function(f){ return f.name !== name; });
+    if (thumbEl) thumbEl.remove();
+  }
+
+  /* ── Video upload: validate max 2 minutes ── */
+  function handleVideo(input) {
+    var file   = input.files[0];
+    var errEl  = document.getElementById('vidError');
+    var prevEl = document.getElementById('videoPreview');
+
+    errEl.style.display = 'none';
+    prevEl.innerHTML    = '';
+
+    if (!file) return;
+
+    var url = URL.createObjectURL(file);
+    var vid = document.createElement('video');
+    vid.src = url;
+    vid.onloadedmetadata = function() {
+      URL.revokeObjectURL(url);
+      if (vid.duration > 120) {
+        errEl.style.display = 'block';
+        input.value = '';
+        return;
+      }
+      var item = document.createElement('div');
+      item.className = 'file-preview-item';
+      item.textContent = '🎬 ' + file.name + ' ';
+      var clrBtn = document.createElement('button');
+      clrBtn.textContent = '✕';
+      clrBtn.addEventListener('click', function(){ clearVideo(); });
+      item.appendChild(clrBtn);
+      prevEl.appendChild(item);
+    };
+  }
+
+  function clearVideo() {
+    document.getElementById('videoFile').value    = '';
+    document.getElementById('videoPreview').innerHTML = '';
+    document.getElementById('vidError').style.display = 'none';
+  }
+
+  /* ── Draft (local-only for now) ── */
+  function saveDraft() {
+    showToast('💾 Draft Saved', 'Your listing has been saved locally.');
+  }
+
+  /* ════════════════════════════════════════
+     SUBMIT LISTING → real backend
+  ════════════════════════════════════════ */
+  async function submitListing() {
+    /* ── 1. Resolve logged-in user ── */
+    var user = null;
+    try { user = JSON.parse(localStorage.getItem('tw_user')); } catch(e) {}
+
+    /* ── 2. Validate user before doing anything else ── */
+    if (!user || !user.id) {
+      showToast('⚠️ Not Logged In', 'Please log in before posting a listing.');
+      setTimeout(function(){ window.location.replace('login.html'); }, 1500);
+      return;
+    }
+
+    /* ── 3. Validate required form fields ── */
+    var game     = document.getElementById('gameType').value;
+    var accId    = document.getElementById('accountId').value.trim();
+    var level    = document.getElementById('accountLevel').value.trim();
+    var priceVal = document.getElementById('price').value.trim();
+    var location = document.getElementById('location').value;
+    var waVal    = (document.getElementById('contactWhatsapp').value || '').trim();
+    var tgVal    = (document.getElementById('contactTelegram').value || '').trim();
+
+    if (!game || !accId || !level || !priceVal || !location) {
+      showToast('⚠️ Missing Fields', 'Please fill in all required fields.');
+      ['gameType','accountId','accountLevel','price','location'].forEach(function(id){
+        var el = document.getElementById(id);
+        if (el && !el.value.trim()) {
+          el.style.borderColor = '#ef4444';
+          el.addEventListener('input', function(){ el.style.borderColor = ''; }, { once: true });
+        }
+      });
+      return;
+    }
+
+    /* ── 4. Require at least one contact method ── */
+    if (!waVal && !tgVal) {
+      showToast('⚠️ Contact Required', 'Please provide a WhatsApp number or Telegram username.');
+      return;
+    }
+
+    /* ── 5. Require at least one image ── */
+    if (!imageFiles.length) {
+      showToast('⚠️ No Images', 'Please upload at least one screenshot.');
+      return;
+    }
+
+    var btn = document.querySelector('.btn-submit');
+    btn.disabled    = true;
+    btn.textContent = '⏳ Uploading images…';
+
+    try {
+      /* ── 6. Upload each image to the server ── */
+      var imageUrls = [];
+      for (var i = 0; i < imageFiles.length; i++) {
+        var fd = new FormData();
+        fd.append('file', imageFiles[i]);
+        var uploadRes = await fetch('http://localhost:5001/api/upload', {
+          method: 'POST',
+          body: fd,
+        });
+        var uploadData = await uploadRes.json();
+        if (!uploadRes.ok || !uploadData.url) {
+          throw new Error('Image upload failed: ' + (uploadData.message || uploadRes.status));
+        }
+        imageUrls.push(uploadData.url);
+      }
+
+      /* ── 7. Upload video if present ── */
+      var videoUrl = null;
+      var videoInput = document.getElementById('videoFile');
+      if (videoInput && videoInput.files && videoInput.files[0]) {
+        btn.textContent = '⏳ Uploading video…';
+        var vfd = new FormData();
+        vfd.append('file', videoInput.files[0]);
+        var vRes = await fetch('http://localhost:5001/api/upload', { method: 'POST', body: vfd });
+        var vData = await vRes.json();
+        if (vRes.ok && vData.url) videoUrl = vData.url;
+      }
+
+      btn.textContent = '⏳ Publishing…';
+
+      var platform   = document.getElementById('platform').value;
+      var collection = document.getElementById('collection').value.trim();
+      var desc       = document.getElementById('description').value.trim();
+      var negotiable = document.getElementById('negotiable').checked;
+
+      /* Build tag list */
+      var tags = [game, platform, location];
+      if (level)      tags.push('level_' + level);
+      if (collection) tags.push('col_' + collection);
+
+      /* Build structured contact object */
+      var contact = {};
+      if (waVal) {
+        var digits = waVal.replace(/[\s\-\(\)]/g, '');
+        contact.whatsapp = digits;
+      }
+      if (tgVal) {
+        contact.telegram = tgVal.replace(/^@/, '');
+      }
+
+      /* ── 8. Build payload ── */
+      var payload = {
+        title:       accId + ' — ' + game.toUpperCase() + (level ? ' · Lvl ' + level : ''),
+        description: desc || (game.toUpperCase() + ' account · Level ' + level),
+        price:       Number(priceVal),
+        currency:    'IQD',
+        category:    'game_account',
+        tags:        tags.join(','),
+        contact:     contact,
+        negotiable:  negotiable,
+        userId:      user.id,
+        images:      imageUrls,
+        video:       videoUrl || undefined,
+        field1:      level ? 'Level ' + level : '',
+        field2:      collection ? 'Collection ' + collection : '',
+        location:    location,
+      };
+
+      console.log('Posting data:', payload);
+
+      /* ── 9. POST to backend ── */
+      var response = await fetch('http://localhost:5001/api/products', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(payload),
+      });
+
+      var result = await response.json();
+      console.log('[DV] listing created:', result);
+
+      if (!response.ok) {
+        throw new Error(result.message || 'Server error ' + response.status);
+      }
+
+      showToast('🚀 Listing Live!', 'Your game account has been published successfully.');
+      setTimeout(function(){ window.location.href = 'view.html?id=' + result.id; }, 1200);
+
+    } catch(err) {
+      console.error('[DV] submitListing:', err);
+      showToast('❌ Error', err.message || 'Failed to publish. Please try again.');
+      btn.disabled    = false;
+      btn.textContent = '🚀 Publish Listing';
+    }
+  }
+
+  /* ── Theme ── */
+  (function(){ if(localStorage.getItem('tw_theme')==='light') document.body.classList.add('light-mode'); })();
+  function toggleTheme(){ var l=document.body.classList.toggle('light-mode'); localStorage.setItem('tw_theme',l?'light':'dark'); }
+</script>
+<script src="global.js"></script>
+<script src="api.js"></script>
+</body>
+</html>

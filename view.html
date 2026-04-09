@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>View Account — DIGIVAULT</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='16' fill='%230ea5e9'/><text x='50%25' y='62%25' text-anchor='middle' font-size='52' font-weight='900' fill='%2303080f' font-family='Arial'>DV</text></svg>" />
+  <style>
+    .view-layout {
+      max-width: 1100px;
+      margin: 40px auto 100px;
+      padding: 0 5%;
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 36px;
+    }
+
+    /* Image gallery */
+    .gallery-main {
+      border-radius: 16px;
+      overflow: hidden;
+      background: linear-gradient(135deg, var(--brown-700), var(--brown-950));
+      border: 1px solid var(--card-bdr);
+      aspect-ratio: 16/9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 5rem;
+      margin-bottom: 14px;
+      cursor: zoom-in;
+      position: relative;
+    }
+    .gallery-main .gallery-label {
+      position: absolute;
+      top: 14px; left: 14px;
+      background: rgba(0,0,0,0.55);
+      border-radius: 8px;
+      padding: 4px 12px;
+      font-size: 0.72rem;
+      color: var(--cream);
+      letter-spacing: 0.06em;
+    }
+    .gallery-thumbs {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .gallery-thumb {
+      width: 72px; height: 56px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--brown-700), var(--brown-950));
+      border: 2px solid rgba(255,255,255,0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      cursor: pointer;
+      transition: var(--transition);
+      overflow: hidden;
+    }
+    .gallery-thumb:hover,
+    .gallery-thumb.active { border-color: var(--amber); }
+    .gallery-thumb img { width:100%; height:100%; object-fit:cover; border-radius:6px; display:block; }
+
+    /* Gallery arrows */
+    .gallery-arrow {
+      position: absolute;
+      top: 50%; transform: translateY(-50%);
+      background: rgba(0,0,0,0.55);
+      border: none; border-radius: 50%;
+      width: 40px; height: 40px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; color: #fff; cursor: pointer;
+      transition: background 0.2s;
+      z-index: 2;
+    }
+    .gallery-arrow:hover { background: rgba(0,0,0,0.82); }
+    .gallery-arrow.prev { left: 10px; }
+    .gallery-arrow.next { right: 10px; }
+    .gallery-arrow[style*="display:none"] { display: none !important; }
+    .video-section {
+      margin-top: 28px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-bdr);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .video-header {
+      padding: 16px 20px 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1rem;
+      letter-spacing: 0.08em;
+      color: var(--amber);
+    }
+    .video-placeholder {
+      height: 200px;
+      background: linear-gradient(135deg, rgba(6,13,28,0.9), rgba(10,22,48,0.6));
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+    .video-placeholder .play-btn {
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      background: var(--amber);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      color: var(--brown-950);
+      transition: var(--transition);
+    }
+    .video-placeholder:hover .play-btn { background: var(--amber-lt); transform: scale(1.08); }
+
+    /* Info section */
+    .info-section {
+      background: var(--card-bg);
+      border: 1px solid var(--card-bdr);
+      border-radius: 16px;
+      padding: 28px;
+      margin-top: 28px;
+    }
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 20px;
+    }
+    .info-item {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 10px;
+      padding: 12px 14px;
+    }
+    .info-item-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+    .info-item-value {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--cream);
+    }
+
+    /* Right panel */
+    .buy-panel {
+      position: sticky;
+      top: 90px;
+      align-self: start;
+    }
+    .buy-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-bdr);
+      border-radius: 16px;
+      padding: 28px;
+    }
+    .price-block {
+      margin-bottom: 20px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+    .price-main {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.2rem;
+      color: var(--amber);
+      letter-spacing: 0.04em;
+      line-height: 1;
+    }
+    .price-currency {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+    .price-neg {
+      display: inline-block;
+      background: rgba(46,204,113,0.12);
+      border: 1px solid rgba(46,204,113,0.3);
+      color: #2ecc71;
+      border-radius: 100px;
+      padding: 3px 10px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      margin-top: 8px;
+    }
+
+    .seller-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 10px;
+      margin-bottom: 18px;
+    }
+    .seller-avatar {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: rgba(14,165,233,0.15);
+      border: 2px solid var(--card-bdr);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+    .seller-name { font-weight: 600; font-size: 0.9rem; color: var(--cream); }
+    .seller-meta { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+    .seller-level {
+      margin-left: auto;
+      background: rgba(14,165,233,0.12);
+      border: 1px solid rgba(14,165,233,0.25);
+      color: var(--amber);
+      border-radius: 6px;
+      padding: 3px 9px;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+
+    /* Warning */
+    .buy-warning {
+      background: rgba(14,165,233,0.06);
+      border: 1.5px solid rgba(14,165,233,0.28);
+      border-radius: 10px;
+      padding: 14px;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+      margin-bottom: 18px;
+    }
+    .buy-warning strong { color: var(--amber); display: block; margin-bottom: 4px; font-size: 0.8rem; }
+
+    /* Buy confirm modal */
+    .buy-modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.8);
+      z-index: 9990;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .buy-modal-overlay.open { display: flex; }
+    .buy-modal {
+      background: var(--brown-900);
+      border: 1px solid var(--card-bdr);
+      border-radius: 20px;
+      padding: 40px;
+      max-width: 500px;
+      width: 100%;
+      text-align: center;
+      animation: slideUp 0.3s ease;
+    }
+    @keyframes slideUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+    .buy-modal-icon { font-size: 3.5rem; margin-bottom: 16px; }
+    .buy-modal h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.6rem;
+      letter-spacing: 0.06em;
+      color: var(--amber);
+      margin-bottom: 14px;
+    }
+    .buy-modal p { font-size: 0.88rem; color: var(--text-muted); line-height: 1.75; margin-bottom: 24px; }
+    .buy-modal-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .contact-option {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      text-decoration: none;
+    }
+    .contact-telegram { background: rgba(0,136,204,0.15); border: 1.5px solid rgba(0,136,204,0.4); color: #22a3dc; }
+    .contact-telegram:hover { background: rgba(0,136,204,0.25); }
+    .contact-whatsapp { background: rgba(37,211,102,0.12); border: 1.5px solid rgba(37,211,102,0.4); color: #25d366; }
+    .contact-whatsapp:hover { background: rgba(37,211,102,0.22); }
+    .contact-dismiss { background: rgba(255,255,255,0.05); border: 1.5px solid rgba(255,255,255,0.1); color: var(--text-muted); }
+    .contact-dismiss:hover { border-color: rgba(255,255,255,0.2); color: var(--cream); }
+
+    /* TC promo */
+    .tc-promo-strip {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(14,165,233,0.06);
+      border: 1px solid rgba(14,165,233,0.2);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-top: 12px;
+    }
+    .tc-promo-strip span { font-size: 0.78rem; color: var(--text-muted); flex: 1; }
+    .tc-promo-strip button {
+      background: none;
+      border: 1.5px solid rgba(14,165,233,0.4);
+      color: var(--amber);
+      border-radius: 8px;
+      padding: 5px 12px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .tc-promo-strip button:hover { background: rgba(14,165,233,0.12); }
+
+    /* Tags */
+    .tag-list { display: flex; gap: 8px; flex-wrap: wrap; margin: 14px 0; }
+    .tag {
+      background: rgba(14,165,233,0.1);
+      border: 1px solid rgba(14,165,233,0.22);
+      border-radius: 6px;
+      padding: 5px 12px;
+      font-size: 0.75rem;
+      color: var(--amber);
+    }
+
+    /* Breadcrumb */
+    .breadcrumb {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 100px 5% 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    .breadcrumb a { color: var(--text-muted); transition: color var(--transition); }
+    .breadcrumb a:hover { color: var(--amber); }
+    .breadcrumb .sep { opacity: 0.4; }
+    .breadcrumb .current { color: var(--cream); }
+
+    @media (max-width: 900px) {
+      .view-layout { grid-template-columns: 1fr; }
+      .buy-panel { position: static; }
+    }
+    @media (max-width: 480px) {
+      .info-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar" role="navigation">
+    <a href="index.html" class="nav-logo">
+      <div class="logo-icon" style="font-family:'Bebas Neue',sans-serif;font-size:0.78rem;font-weight:900;letter-spacing:0.04em;">DV</div>
+      DIGIV<span>AULT</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html" data-i18n="nav.home">Home</a></li>
+      <li><a href="market.html" data-i18n="nav.accounts">Accounts</a></li>
+      <li><a href="index.html#contact" data-i18n="nav.contact">Contact</a></li>
+    </ul>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <button onclick="openAccountPage()" title="My Account" style="width:40px;height:40px;border-radius:50%;background:rgba(14,165,233,.12);border:1.5px solid rgba(14,165,233,.32);display:flex;align-items:center;justify-content:center;font-size:1.15rem;cursor:pointer;transition:var(--transition);flex-shrink:0;" onmouseover="this.style.background='rgba(14,165,233,.22)';this.style.borderColor='var(--amber)'" onmouseout="this.style.background='rgba(14,165,233,.12)';this.style.borderColor='rgba(14,165,233,.32)'">👤</button>
+      <div id="lang-switcher"></div>
+      <button class="hamburger" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+  <nav class="mobile-menu">
+    <a href="index.html" data-i18n="nav.home">Home</a>
+    <a href="market.html" data-i18n="nav.accounts">Accounts</a>
+    <a href="index.html#contact" data-i18n="nav.contact">Contact</a>
+    <a href="javascript:openAccountPage()">👤 My Account</a>
+  </nav>
+
+  <!-- BUY CONFIRM MODAL -->
+  <div class="buy-modal-overlay" id="buyModal" onclick="if(event.target===this)closeBuyModal()">
+    <div class="buy-modal">
+      <div class="buy-modal-icon">⚠️</div>
+      <h2>Before You Continue</h2>
+      <p>
+        <strong style="color:var(--amber);">DIGIVAULT does not handle payments between buyer and seller.</strong><br><br>
+        All deals are arranged directly between parties. Verify the seller's identity before sharing any personal information or making any payment. Proceed at your own risk.
+      </p>
+      <p style="font-size:0.82rem;color:var(--text-muted);background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:12px;">
+        Contact the seller directly via their preferred channel below:
+      </p>
+      <div class="buy-modal-actions" style="margin-top:16px;">
+        <a href="#" class="contact-option contact-telegram" id="modalTelegram">✈️ Contact via Telegram</a>
+        <a href="#" class="contact-option contact-whatsapp" id="modalWhatsapp">📱 Contact via WhatsApp</a>
+        <button class="contact-option contact-dismiss" onclick="closeBuyModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BREADCRUMB -->
+  <div class="breadcrumb">
+    <a href="index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="market.html" id="bcCategory">Accounts</a>
+    <span class="sep">/</span>
+    <span class="current" id="bcName">Account Details</span>
+  </div>
+
+  <!-- MAIN VIEW LAYOUT -->
+  <main>
+  <div class="view-layout">
+
+    <!-- LEFT: Images + Video + Info -->
+    <div>
+      <!-- Image gallery -->
+      <div class="gallery-main" id="galleryMain">
+        <span class="gallery-label">Loading…</span>
+        <button class="gallery-arrow prev" id="galleryPrev" onclick="shiftImage(-1)" style="display:none;">‹</button>
+        <button class="gallery-arrow next" id="galleryNext" onclick="shiftImage(1)"  style="display:none;">›</button>
+      </div>
+      <div class="gallery-thumbs" id="galleryThumbs"></div>
+
+      <!-- Video -->
+      <div class="video-section" id="videoSection" style="margin-top:24px;display:none;">
+        <div class="video-header">🎥 Account Video</div>
+        <div class="video-placeholder" id="videoSlot"></div>
+      </div>
+
+      <!-- Full Info -->
+      <div class="info-section">
+        <h2 style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:0.04em;color:var(--cream);" id="infoTitle">Loading…</h2>
+        <div class="tag-list" id="infoTags"></div>
+        <p style="font-size:0.9rem;color:var(--text-muted);line-height:1.8;" id="infoDesc"></p>
+        <div class="info-grid" id="infoGrid">
+          <div class="info-item">
+            <div class="info-item-label">Account ID</div>
+            <div class="info-item-value" id="infoId">—</div>
+          </div>
+          <div class="info-item">
+            <div class="info-item-label">Location</div>
+            <div class="info-item-value" id="infoLocation">—</div>
+          </div>
+          <div class="info-item">
+            <div class="info-item-label" id="infoField1Label">Info 1</div>
+            <div class="info-item-value" id="infoField1">—</div>
+          </div>
+          <div class="info-item">
+            <div class="info-item-label" id="infoField2Label">Info 2</div>
+            <div class="info-item-value" id="infoField2">—</div>
+          </div>
+          <div class="info-item">
+            <div class="info-item-label">Category</div>
+            <div class="info-item-value" id="infoCategory">—</div>
+          </div>
+          <div class="info-item">
+            <div class="info-item-label">Price</div>
+            <div class="info-item-value" id="infoPrice" style="color:var(--amber);">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Buy Panel -->
+    <div class="buy-panel">
+      <div class="buy-card">
+        <div class="price-block">
+          <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;">Asking Price</div>
+          <div class="price-main" id="panelPrice">—</div>
+          <div class="price-currency">Iraqi Dinar (IQD)</div>
+          <div class="price-neg">✓ Negotiable</div>
+        </div>
+
+        <!-- Seller -->
+        <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;">Seller</div>
+        <div class="seller-box">
+          <div class="seller-avatar">👤</div>
+          <div>
+            <div class="seller-name">—</div>
+            <div class="seller-meta">—</div>
+          </div>
+          <div class="seller-level">—</div>
+        </div>
+
+        <!-- Warning -->
+        <div class="buy-warning">
+          <strong>⚠️ Important Notice</strong>
+          DIGIVAULT does not handle direct payments. All deals are the buyer's and seller's own responsibility. Always verify before making any payment.
+        </div>
+
+        <!-- Buy CTA -->
+        <button onclick="openContactModal()" class="btn btn-primary" style="width:100%;justify-content:center;font-size:1rem;padding:16px;margin-bottom:10px;">
+          💬 Contact Seller
+        </button>
+        <button onclick="toggleWishlist(this)" style="width:100%;justify-content:center;display:flex;align-items:center;gap:8px;background:transparent;border:1.5px solid rgba(255,255,255,0.1);border-radius:var(--radius-sm);padding:12px;color:var(--text-muted);font-size:0.88rem;font-weight:600;cursor:pointer;transition:var(--transition);"
+          onmouseover="this.style.borderColor='var(--amber)';this.style.color='var(--amber)'"
+          onmouseout="if(!this.dataset.wished){this.style.borderColor='rgba(255,255,255,0.1)';this.style.color='var(--text-muted)'}">
+          🤍 Add to Wishlist
+        </button>
+
+        <!-- TC Promo — hidden by default; JS shows only for listing owner -->
+        <div class="tc-promo-strip" id="promoStrip" style="display:none;">
+          <span>🪙 Promote this listing to more buyers</span>
+          <button onclick="promoteThis()">5 DV Coins</button>
+        </div>
+      </div>
+
+      <!-- Share card -->
+      <div style="background:var(--card-bg);border:1px solid var(--card-bdr);border-radius:14px;padding:20px;margin-top:16px;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:0.9rem;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:12px;">Share This Listing</div>
+        <div style="display:flex;gap:8px;">
+          <button style="flex:1;background:rgba(0,136,204,0.1);border:1px solid rgba(0,136,204,0.3);color:#22a3dc;border-radius:8px;padding:9px;font-size:0.8rem;font-weight:600;cursor:pointer;">✈️ Telegram</button>
+          <button style="flex:1;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:var(--text-muted);border-radius:8px;padding:9px;font-size:0.8rem;font-weight:600;cursor:pointer;" onclick="copyLink(this)">🔗 Copy Link</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-bottom">
+        <p class="footer-copy">© 2025 DIGIVAULT. All rights reserved.</p>
+        <div class="footer-social">
+          <a href="#" class="social-btn">💬</a>
+          <a href="#" class="social-btn">✈️</a>
+          <a href="#" class="social-btn">𝕏</a>
+        </div>
+      </div>
+    </div>
+    <div id="lang-switcher"></div>
+  </footer>
+
+  <script src="i18n.js"></script>
+  <script src="script.js"></script>
+  <script src="api.js"></script>
+  <script src="global.js"></script>
+  <script src="dashboard.js"></script>
+  <script>
+    'use strict';
+
+    (function(){ if(localStorage.getItem('tw_theme')==='light') document.body.classList.add('light-mode'); })();
+    function toggleTheme(){ var l=document.body.classList.toggle('light-mode'); localStorage.setItem('tw_theme',l?'light':'dark'); }
+
+    /* ── Helpers ── */
+    function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+    /* ── Resolve image URL from {url} object or plain string — no fallback ── */
+    function getImgUrl(img) {
+      if (!img) return null;
+      if (typeof img === 'object' && img.url) return img.url;
+      if (typeof img === 'string' && img)     return img;
+      return null;
+    }
+
+    /* ── Get current logged-in user ID from localStorage ── */
+    function getCurrentUserId() {
+      try {
+        var raw = localStorage.getItem('tw_user');
+        if (!raw) return null;
+        var u = JSON.parse(raw);
+        return String(u.id || u._id || '');
+      } catch(e) { return null; }
+    }
+
+    /* ── Contact modal ── */
+    function openContactModal() {
+      document.getElementById('buyModal').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeBuyModal() {
+      document.getElementById('buyModal').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    function openBuyModal() { openContactModal(); }
+
+    /* ── Render main image by index ── */
+    function renderGalleryMain(idx) {
+      var imgs   = window._galleryImages || [];
+      var total  = imgs.length;
+      if (!total) return;
+      idx = ((idx % total) + total) % total;   // wrap around
+      window._galleryIndex = idx;
+
+      var url    = esc(getImgUrl(imgs[idx]));
+      var galleryMain = document.getElementById('galleryMain');
+      if (!galleryMain) return;
+
+      // Preserve / recreate arrow buttons
+      galleryMain.innerHTML =
+        '<img id="mainImg" src="' + url + '" alt="main" style="width:100%;height:100%;object-fit:cover;">' +
+        '<span class="gallery-label">Image ' + (idx + 1) + ' of ' + total + '</span>' +
+        '<button class="gallery-arrow prev" id="galleryPrev" onclick="shiftImage(-1)"' + (total <= 1 ? ' style="display:none;"' : '') + '>‹</button>' +
+        '<button class="gallery-arrow next" id="galleryNext" onclick="shiftImage(1)"'  + (total <= 1 ? ' style="display:none;"' : '') + '>›</button>';
+
+      // Sync thumbnail highlights
+      document.querySelectorAll('.gallery-thumb').forEach(function(t, i) {
+        t.classList.toggle('active', i === idx);
+      });
+    }
+
+    /* ── Shift image by delta (-1 or +1) ── */
+    function shiftImage(delta) {
+      renderGalleryMain((window._galleryIndex || 0) + delta);
+    }
+
+    /* ── Gallery: thumbnail click → renderGalleryMain(i) handles everything ── */
+
+    /* ── Wishlist toggle ── */
+    function toggleWishlist(btn) {
+      if (btn.dataset.wished) {
+        delete btn.dataset.wished;
+        btn.innerHTML = '🤍 Add to Wishlist';
+        btn.style.borderColor = 'rgba(255,255,255,0.1)';
+        btn.style.color = 'var(--text-muted)';
+      } else {
+        btn.dataset.wished = '1';
+        btn.innerHTML = '❤️ Saved to Wishlist';
+        btn.style.borderColor = 'var(--amber)';
+        btn.style.color = 'var(--amber)';
+      }
+    }
+
+    /* ── Promote listing ── */
+    async function promoteThis() {
+      var id = new URLSearchParams(window.location.search).get('id') || window._currentProductId;
+      if (!id) return;
+      if (!DVAPI.Auth.isLoggedIn()) { showToast('⚠️ Login required','Please sign in to promote listings.'); return; }
+      try {
+        var res = await DVAPI.Products.promote(id);
+        showToast('🚀 Promoted!','Listing is now promoted! Coins remaining: ' + res.coinsRemaining);
+        if (window.TW) TW.updateCoins(-5);
+        var strip = document.getElementById('promoStrip');
+        if (strip) strip.style.display = 'none';
+      } catch(err) {
+        console.error('[DV] promoteThis:', err);
+        showToast('❌ Error', err.message);
+      }
+    }
+
+    /* ── Copy link ── */
+    function copyLink(btn) {
+      navigator.clipboard.writeText(window.location.href).then(function() {
+        var orig = btn.innerHTML;
+        btn.innerHTML = '✅ Copied!';
+        setTimeout(function(){ btn.innerHTML = orig; }, 2000);
+      });
+    }
+
+    /* ── Toast fallback ── */
+    if (typeof showToast === 'undefined') {
+      window.showToast = function(t, m) {
+        var el = document.createElement('div');
+        el.style.cssText = 'position:fixed;bottom:26px;right:22px;background:linear-gradient(135deg,#0e1f38,#152840);border:1px solid rgba(14,165,233,.4);border-radius:12px;padding:13px 18px;color:#e0f2fe;font-size:.83rem;z-index:99999;box-shadow:0 8px 28px rgba(0,0,0,.5);max-width:290px;font-family:DM Sans,sans-serif;';
+        el.innerHTML = '<strong style="color:#38bdf8;display:block;margin-bottom:3px;">' + t + '</strong>' + m;
+        document.body.appendChild(el);
+        setTimeout(function(){ el.remove(); }, 3400);
+      };
+    }
+
+    /* ════════════════════════════════════════
+       LOAD PRODUCT FROM BACKEND
+    ════════════════════════════════════════ */
+    window.addEventListener('DOMContentLoaded', async function() {
+      var id = new URLSearchParams(window.location.search).get('id');
+
+      if (!id) {
+        window.location.replace('market.html');
+        return;
+      }
+
+      var galleryMain   = document.getElementById('galleryMain');
+      var galleryThumbs = document.getElementById('galleryThumbs');
+
+      if (galleryMain) galleryMain.innerHTML = '<div style="font-size:.88rem;color:var(--text-muted);">Loading…</div>';
+
+      try {
+        var res = await fetch('http://localhost:5001/api/product/' + id);
+        if (!res.ok) { throw new Error('Product not found (HTTP ' + res.status + ')'); }
+        var p = await res.json();
+        console.log('[DV] product loaded:', p);
+
+        if (!p || !p.title) { throw new Error('Invalid product data returned from server.'); }
+
+        /* ── Page title ── */
+        document.title = p.title + ' — DIGIVAULT';
+
+        /* ── Breadcrumb ── */
+        var bcName = document.getElementById('bcName');
+        if (bcName) bcName.textContent = p.title;
+
+        /* ── Info fields ── */
+        var el;
+        if ((el = document.getElementById('infoTitle')))    el.textContent = p.title;
+        if ((el = document.getElementById('infoDesc')))     el.textContent = p.description || 'No description provided.';
+        if ((el = document.getElementById('infoId')))       el.textContent = '#' + String(p.id);
+        if ((el = document.getElementById('infoLocation'))) el.textContent = p.location || '—';
+        if ((el = document.getElementById('infoField1')))   el.textContent = p.field1    || '—';
+        if ((el = document.getElementById('infoField2')))   el.textContent = p.field2    || '—';
+        if ((el = document.getElementById('infoCategory'))) el.textContent = (p.category || '').replace(/_/g, ' ');
+        if ((el = document.getElementById('infoPrice')))    el.textContent = Number(p.price).toLocaleString() + ' IQD';
+        if ((el = document.getElementById('panelPrice')))   el.textContent = Number(p.price).toLocaleString();
+
+        /* ── Tags ── */
+        var infoTags = document.getElementById('infoTags');
+        if (infoTags) {
+          infoTags.innerHTML = (p.tags && p.tags.length)
+            ? p.tags.map(function(t){ return '<span class="tag">' + esc(t) + '</span>'; }).join('')
+            : '';
+        }
+
+        /* ── Seller info — use userId since no user profile endpoint ── */
+        var sellerName  = document.querySelector('.seller-name');
+        var sellerMeta  = document.querySelector('.seller-meta');
+        var sellerLevel = document.querySelector('.seller-level');
+        if (sellerName)  sellerName.textContent  = p.userId ? 'User #' + p.userId : 'Seller';
+        if (sellerMeta)  sellerMeta.textContent  = '';
+        if (sellerLevel) sellerLevel.textContent  = '';
+
+        /* ── Contact modal links ── */
+        var contact = p.contact || {};
+        // Handle legacy plain-string contact
+        if (typeof contact === 'string' && contact.trim()) {
+          var raw = contact.trim();
+          if (raw.includes('t.me') || raw.startsWith('@')) {
+            contact = { telegram: raw };
+          } else {
+            contact = { whatsapp: raw };
+          }
+        }
+
+        var tgLink = document.getElementById('modalTelegram');
+        var waLink = document.getElementById('modalWhatsapp');
+
+        if (tgLink) {
+          if (contact.telegram) {
+            var tgVal = String(contact.telegram).trim();
+            tgLink.href = tgVal.startsWith('http') ? tgVal : 'https://t.me/' + tgVal.replace(/^@/, '');
+            tgLink.style.display = '';
+          } else {
+            tgLink.style.display = 'none';
+          }
+        }
+        if (waLink) {
+          if (contact.whatsapp) {
+            var waVal = String(contact.whatsapp).replace(/\D/g, '');
+            waLink.href = 'https://wa.me/' + waVal;
+            waLink.style.display = '';
+          } else {
+            waLink.style.display = 'none';
+          }
+        }
+
+        // Hide entire contact button if neither method exists
+        var contactBtn = document.querySelector('button[onclick="openContactModal()"]');
+        if (contactBtn && !contact.telegram && !contact.whatsapp) {
+          contactBtn.style.display = 'none';
+        }
+
+        /* ════════════════════════════════════════
+           IMAGES — ALL images, index-based navigation
+           Thumbnails pass index only → no URL escaping issues
+           renderGalleryMain(idx) handles main img + arrows + label + thumb highlight
+        ════════════════════════════════════════ */
+        var imgs = (p.images && p.images.length) ? p.images : [];
+        window._galleryImages = imgs;
+        window._galleryIndex  = 0;
+
+        if (imgs.length) {
+          // Build thumbnails — onclick passes index only, no URL embedding
+          if (galleryThumbs) {
+            galleryThumbs.innerHTML = imgs.map(function(img, i) {
+              var u = getImgUrl(img) || '';
+              return (
+                '<div class="gallery-thumb' + (i === 0 ? ' active' : '') + '" onclick="renderGalleryMain(' + i + ')">' +
+                '<img src="' + esc(u) + '" alt="thumb ' + (i + 1) + '" loading="lazy">' +
+                '</div>'
+              );
+            }).join('');
+          }
+          // Render initial main image
+          renderGalleryMain(0);
+        } else {
+          if (galleryMain)   galleryMain.innerHTML   = '';
+          if (galleryThumbs) galleryThumbs.innerHTML = '';
+        }
+
+        /* ── Video — show section only when a real video URL exists ── */
+        var videoSection = document.getElementById('videoSection');
+        var videoSlot    = document.getElementById('videoSlot');
+        if (p.video && p.video.url) {
+          if (videoSlot) {
+            videoSlot.innerHTML =
+              '<video controls preload="metadata" style="width:100%;max-height:320px;display:block;" src="' + esc(p.video.url) + '"></video>';
+            videoSlot.style.height = 'auto';
+            videoSlot.style.cursor = 'default';
+          }
+          if (videoSection) videoSection.style.display = 'block';
+        } else {
+          if (videoSection) videoSection.style.display = 'none';
+        }
+
+        /* ── Promote strip — visible only for the listing owner ── */
+        var currentUid = getCurrentUserId();
+        var promoStrip = document.getElementById('promoStrip');
+        if (promoStrip) {
+          promoStrip.style.display =
+            (currentUid && String(p.userId) === currentUid && !p.promoted) ? 'flex' : 'none';
+        }
+
+        window._currentProductId = id;
+
+      } catch(err) {
+        console.error('[DV] loadProduct:', err);
+        var titleEl = document.getElementById('infoTitle');
+        var descEl  = document.getElementById('infoDesc');
+        if (titleEl) titleEl.textContent = 'Could not load listing';
+        if (descEl)  descEl.textContent  = err.message;
+        if (galleryMain) galleryMain.innerHTML = '<span style="font-size:3rem;">⚠️</span>';
+        showToast('❌ Error', 'Failed to load product: ' + err.message);
+      }
+    });
+  </script>
+</body>
+</html>

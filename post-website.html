@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Post Website Template — DIGIVAULT</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='16' fill='%230ea5e9'/><text x='50%25' y='62%25' text-anchor='middle' font-size='52' font-weight='900' fill='%2303080f' font-family='Arial'>DV</text></svg>"/>
+  <style>
+    .post-wrap{max-width:760px;margin:0 auto;padding:110px 5% 80px;}
+    .post-back{display:inline-flex;align-items:center;gap:8px;color:var(--text-muted);font-size:.82rem;font-weight:600;text-decoration:none;margin-bottom:24px;transition:var(--transition);}
+    .post-back:hover{color:var(--amber);}
+    .post-hero{margin-bottom:32px;}
+    .post-hero-tag{font-size:.65rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+    .post-hero-tag::before{content:'';display:block;width:18px;height:2px;background:var(--amber);border-radius:2px;}
+    .post-hero h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(1.8rem,4vw,2.6rem);letter-spacing:.04em;color:var(--cream);margin-bottom:6px;}
+    .post-hero p{font-size:.85rem;color:var(--text-muted);}
+
+    .post-form{background:var(--card-bg);border:1px solid var(--card-bdr);border-radius:20px;padding:32px;display:flex;flex-direction:column;gap:20px;}
+
+    .pf-section{border-bottom:1px solid rgba(255,255,255,.05);padding-bottom:20px;}
+    .pf-section:last-of-type{border-bottom:none;padding-bottom:0;}
+    .pf-section-title{font-family:'Bebas Neue',sans-serif;font-size:.95rem;letter-spacing:.08em;color:var(--amber);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+
+    .pf-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+    .pf-group{display:flex;flex-direction:column;gap:6px;}
+    .pf-lbl{font-size:.69rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);}
+    .pf-inp,.pf-sel,.pf-ta{
+      background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.09);
+      border-radius:9px;padding:11px 14px;font-size:.9rem;color:var(--cream);
+      outline:none;font-family:'DM Sans',sans-serif;transition:var(--transition);width:100%;
+    }
+    .pf-inp:focus,.pf-sel:focus,.pf-ta:focus{border-color:var(--amber);background:rgba(14,165,233,.04);}
+    .pf-inp::placeholder,.pf-ta::placeholder{color:rgba(255,255,255,.22);}
+    .pf-sel{appearance:none;}
+    .pf-ta{resize:vertical;min-height:100px;}
+
+    /* Price row */
+    .price-row{display:flex;gap:10px;align-items:stretch;}
+    .price-prefix{background:rgba(14,165,233,.1);border:1.5px solid rgba(14,165,233,.22);border-radius:9px 0 0 9px;padding:11px 14px;font-size:.82rem;color:var(--amber);font-weight:700;display:flex;align-items:center;border-right:none;white-space:nowrap;}
+    .price-input{flex:1;border-radius:0 9px 9px 0!important;}
+
+    /* Upload zone */
+    .upload-zone{
+      border:2px dashed rgba(14,165,233,.25);border-radius:12px;
+      padding:32px;text-align:center;cursor:pointer;transition:var(--transition);
+      position:relative;overflow:hidden;
+    }
+    .upload-zone:hover{border-color:var(--amber);background:rgba(14,165,233,.04);}
+    .upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;}
+    .upload-icon{font-size:2.2rem;margin-bottom:10px;}
+    .upload-text{font-size:.86rem;color:var(--text-muted);}
+    .upload-hint{font-size:.73rem;color:rgba(255,255,255,.25);margin-top:4px;}
+
+    /* Negotiable toggle */
+    .toggle-row{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:13px 15px;}
+    .toggle-label{font-size:.87rem;color:var(--cream);font-weight:500;}
+    .toggle-sub{font-size:.73rem;color:var(--text-muted);}
+    .toggle-switch{position:relative;width:44px;height:24px;flex-shrink:0;}
+    .toggle-switch input{opacity:0;width:0;height:0;}
+    .toggle-slider{position:absolute;inset:0;background:rgba(255,255,255,.12);border-radius:100px;cursor:pointer;transition:.3s;}
+    .toggle-slider::before{content:'';position:absolute;width:18px;height:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.3s;}
+    .toggle-switch input:checked + .toggle-slider{background:var(--amber);}
+    .toggle-switch input:checked + .toggle-slider::before{transform:translateX(20px);}
+
+    /* Submit */
+    .post-submit-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap;}
+    .btn-submit{flex:1;padding:14px 24px;background:linear-gradient(135deg,#0ea5e9,#0284c7);border:none;border-radius:11px;color:#fff;font-size:.95rem;font-weight:700;cursor:pointer;transition:var(--transition);box-shadow:0 4px 18px rgba(14,165,233,.32);}
+    .btn-submit:hover{background:linear-gradient(135deg,#38bdf8,#0ea5e9);transform:translateY(-1px);}
+    .btn-draft{padding:14px 24px;background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.1);border-radius:11px;color:var(--text-muted);font-size:.88rem;font-weight:600;cursor:pointer;transition:var(--transition);}
+    .btn-draft:hover{border-color:rgba(255,255,255,.25);color:var(--cream);}
+
+    /* Light mode */
+    body.light-mode .post-form{background:rgba(255,255,255,.9)!important;border-color:rgba(14,165,233,.18)!important;}
+    body.light-mode .pf-section{border-bottom-color:rgba(14,165,233,.1)!important;}
+    body.light-mode .pf-lbl{color:#475569!important;}
+    body.light-mode .pf-inp,.pf-sel,.pf-ta{background:#fff!important;border-color:rgba(14,165,233,.22)!important;color:#0c1a2e!important;}
+    body.light-mode .pf-inp::placeholder,.pf-ta::placeholder{color:#94a3b8!important;}
+    body.light-mode .post-hero h1{color:#0c1a2e!important;}
+    body.light-mode .post-hero p{color:#475569!important;}
+    body.light-mode .toggle-row{background:rgba(14,165,233,.05)!important;border-color:rgba(14,165,233,.14)!important;}
+    body.light-mode .toggle-label{color:#0c1a2e!important;}
+    body.light-mode .toggle-sub{color:#475569!important;}
+    body.light-mode .upload-zone{border-color:rgba(14,165,233,.3)!important;}
+    body.light-mode .upload-text{color:#475569!important;}
+
+    @media(max-width:600px){
+      .pf-row{grid-template-columns:1fr;}
+      .post-submit-row{flex-direction:column;}
+      .btn-submit,.btn-draft{width:100%;}
+    }
+  </style>
+</head>
+<body>
+<nav class="navbar" role="navigation">
+  <a href="index.html" class="nav-logo">
+    <div class="logo-icon" style="font-family:'Bebas Neue',sans-serif;font-size:.78rem;font-weight:900;letter-spacing:.04em;">DV</div>
+    DIGI<span>VAULT</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="market.html">Marketplace</a></li>
+    <li><a href="account.html">My Account</a></li>
+  </ul>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <button onclick="openAccountPage()" title="My Account" style="width:38px;height:38px;border-radius:50%;background:rgba(14,165,233,.12);border:1.5px solid rgba(14,165,233,.3);display:flex;align-items:center;justify-content:center;font-size:1.1rem;cursor:pointer;transition:var(--transition);">👤</button>
+    <div id="lang-switcher"></div>
+    <button class="hamburger"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+<nav class="mobile-menu">
+  <a href="index.html">Home</a>
+  <a href="market.html">Marketplace</a>
+  <a href="account.html">My Account</a>
+</nav>
+
+<div class="post-wrap">
+  <a href="account.html" class="post-back">← Back to Dashboard</a>
+
+  <div class="post-hero">
+    <div class="post-hero-tag">Post a Listing · Website Template</div>
+    <h1>🌐 List Your Website Template</h1>
+    <p>Share your HTML, WordPress, or React template with the DIGIVAULT community.</p>
+  </div>
+
+  <div class="post-form">
+
+    <!-- Category -->
+    <div class="pf-section">
+      <div class="pf-section-title">🖥️ Template Type</div>
+      <div class="pf-row">
+        <div class="pf-group">
+          <label class="pf-lbl">Framework / Platform *</label>
+          <select class="pf-sel" id="framework">
+            <option value="" disabled selected>Select…</option>
+            <option value="html">HTML / CSS / JS</option>
+            <option value="react">React</option>
+            <option value="vue">Vue.js</option>
+            <option value="wordpress">WordPress</option>
+            <option value="nextjs">Next.js</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="pf-group">
+          <label class="pf-lbl">Template Category *</label>
+          <select class="pf-sel" id="category">
+            <option value="" disabled selected>Select…</option>
+            <option value="landing">Landing Page / SaaS</option>
+            <option value="portfolio">Portfolio</option>
+            <option value="ecommerce">E-commerce</option>
+            <option value="dashboard">Admin Dashboard</option>
+            <option value="blog">Blog</option>
+            <option value="agency">Agency / Business</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Info -->
+    <div class="pf-section">
+      <div class="pf-section-title">📋 Template Details</div>
+      <div class="pf-group" style="margin-bottom:14px;">
+        <label class="pf-lbl">Title *</label>
+        <input class="pf-inp" type="text" id="title" placeholder="e.g. SaaS Landing Pro — Dark Mode + Animated"/>
+      </div>
+      <div class="pf-group">
+        <label class="pf-lbl">Description *</label>
+        <textarea class="pf-ta" id="description" rows="5" placeholder="Describe your template — features, pages included, what it's best for…"></textarea>
+      </div>
+    </div>
+
+    <!-- Technical -->
+    <div class="pf-section">
+      <div class="pf-section-title">⚙️ Technical Specs</div>
+      <div class="pf-row" style="margin-bottom:14px;">
+        <div class="pf-group">
+          <label class="pf-lbl">Number of Pages</label>
+          <input class="pf-inp" type="number" id="pages" placeholder="e.g. 8"/>
+        </div>
+        <div class="pf-group">
+          <label class="pf-lbl">Number of Components</label>
+          <input class="pf-inp" type="text" id="components" placeholder="e.g. 50+"/>
+        </div>
+      </div>
+      <div class="pf-row">
+        <div class="pf-group">
+          <label class="pf-lbl">Responsive?</label>
+          <select class="pf-sel" id="responsive">
+            <option value="yes">Yes — fully responsive</option>
+            <option value="partial">Partially responsive</option>
+            <option value="no">Desktop only</option>
+          </select>
+        </div>
+        <div class="pf-group">
+          <label class="pf-lbl">Dark Mode?</label>
+          <select class="pf-sel" id="darkMode">
+            <option value="yes">Yes — included</option>
+            <option value="no">No</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Includes -->
+    <div class="pf-section">
+      <div class="pf-section-title">📦 What's Included</div>
+      <div class="pf-group">
+        <label class="pf-lbl">Files Included (comma separated)</label>
+        <input class="pf-inp" type="text" id="files" placeholder="e.g. HTML, CSS, JS, Figma file, Documentation"/>
+      </div>
+      <div style="margin-top:12px;" class="toggle-row">
+        <div>
+          <div class="toggle-label">Lifetime Updates Included</div>
+          <div class="toggle-sub">Buyer receives future template updates</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="lifetimeUpdates"/>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Price -->
+    <div class="pf-section">
+      <div class="pf-section-title">💰 Pricing</div>
+      <div class="pf-group" style="margin-bottom:14px;">
+        <label class="pf-lbl">Asking Price (IQD) *</label>
+        <div class="price-row">
+          <div class="price-prefix">IQD</div>
+          <input class="pf-inp price-input" type="number" id="price" placeholder="e.g. 85000"/>
+        </div>
+      </div>
+      <div class="toggle-row">
+        <div>
+          <div class="toggle-label">Price is Negotiable</div>
+          <div class="toggle-sub">Allow buyers to make offers</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="negotiable" checked/>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Preview images -->
+    <div class="pf-section">
+      <div class="pf-section-title">🖼️ Preview Images</div>
+      <div class="upload-zone">
+        <input type="file" accept="image/*" multiple id="previews"/>
+        <div class="upload-icon">🖥️</div>
+        <div class="upload-text">Upload template screenshots or mockups</div>
+        <div class="upload-hint">PNG, JPG · Max 5MB each · Up to 6 images</div>
+      </div>
+    </div>
+
+    <!-- Demo / Repo -->
+    <div class="pf-section">
+      <div class="pf-section-title">🔗 Links (Optional)</div>
+      <div class="pf-row">
+        <div class="pf-group">
+          <label class="pf-lbl">Live Demo URL</label>
+          <input class="pf-inp" type="url" id="demoUrl" placeholder="https://demo.yoursite.com"/>
+        </div>
+        <div class="pf-group">
+          <label class="pf-lbl">Video Preview</label>
+          <input class="pf-inp" type="url" id="videoLink" placeholder="https://youtube.com/watch?v=…"/>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contact -->
+    <div class="pf-section">
+      <div class="pf-section-title">📬 Contact Method</div>
+      <div class="pf-row">
+        <div class="pf-group">
+          <label class="pf-lbl">Telegram</label>
+          <input class="pf-inp" type="text" id="telegram" placeholder="@yourusername"/>
+        </div>
+        <div class="pf-group">
+          <label class="pf-lbl">Discord (optional)</label>
+          <input class="pf-inp" type="text" id="discord" placeholder="user#0000"/>
+        </div>
+      </div>
+    </div>
+
+    <div class="post-submit-row">
+      <button class="btn-submit" onclick="submitListing()">🚀 Publish Template</button>
+      <button class="btn-draft" onclick="saveDraft()">💾 Save as Draft</button>
+    </div>
+  </div>
+</div>
+
+<script src="i18n.js"></script>
+<script src="script.js"></script>
+<script src="dashboard.js"></script>
+<script>
+  if (!localStorage.getItem('tw_user') && !null) window.location.href = 'login.html';
+  function submitListing() {
+    var t=document.getElementById('title').value.trim();
+    var d=document.getElementById('description').value.trim();
+    var p=document.getElementById('price').value;
+    var f=document.getElementById('framework').value;
+    if (!t||!d||!p||!f){showToast('⚠️ Missing fields','Please fill all required fields.');return;}
+    showToast('🚀 Template Submitted!','Your template is under review and will go live within 24 hours.');
+    setTimeout(()=>window.location.href='account.html',2000);
+  }
+  function saveDraft(){showToast('💾 Draft Saved','Listing saved. Edit it from My Listings.');}
+  if(typeof showToast==='undefined'){window.showToast=function(t,m){var el=document.createElement('div');el.style.cssText='position:fixed;bottom:26px;right:22px;background:linear-gradient(135deg,#0e1f38,#152840);border:1px solid rgba(14,165,233,.4);border-radius:12px;padding:13px 18px;color:#e0f2fe;font-size:.83rem;z-index:9999;box-shadow:0 8px 28px rgba(0,0,0,.5);max-width:290px;';el.innerHTML='<strong style="color:#38bdf8;display:block;margin-bottom:3px;">'+t+'</strong>'+m;document.body.appendChild(el);setTimeout(()=>el.remove(),3400);};}
+</script>
+<script>
+  (function(){if(localStorage.getItem('tw_theme')==='light')document.body.classList.add('light-mode');})();
+  function toggleTheme(){var l=document.body.classList.toggle('light-mode');localStorage.setItem('tw_theme',l?'light':'dark');}
+</script>
+</body>
+</html>

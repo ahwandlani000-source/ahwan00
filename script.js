@@ -164,9 +164,10 @@
   const form = document.getElementById('sellForm');
   if (!form) return;
 
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
+    // Validate required fields
     let valid = true;
     form.querySelectorAll('[required]').forEach(field => {
       if (!field.value.trim()) {
@@ -179,16 +180,75 @@
 
     const btn = form.querySelector('.btn-submit');
     const originalText = btn.innerHTML;
-    btn.innerHTML = '⏳ Listing Account...';
+    btn.innerHTML = '⏳ Submitting…';
     btn.disabled = true;
 
-    setTimeout(() => {
-      showToast('🎉 Listing Created!', 'Your account has been submitted for review.');
+    // Map UI category values to API category strings
+    const categoryMap = {
+      pubg:     'game_account',
+      ea:       'game_account',
+      cr:       'game_account',
+      fortnite: 'game_account',
+      web:      'website_template',
+      canva:    'canva_template',
+      other:    'game_account',
+    };
+
+    const rawCategory = (document.getElementById('accountCategory') || {}).value || 'other';
+    const apiCategory = categoryMap[rawCategory] || 'game_account';
+
+    // Build tags from highlights + game/category selector
+    const highlights = (document.getElementById('accountHighlights') || {}).value || '';
+    const levelVal   = (document.getElementById('accountLevel')      || {}).value || '';
+    const tagsArr    = [rawCategory];
+    if (levelVal)   tagsArr.push('level_' + levelVal);
+    if (highlights) highlights.split(',').map(s => s.trim()).filter(Boolean).forEach(t => tagsArr.push(t));
+
+    // Resolve logged-in user for userId
+    var _user = null;
+    try { _user = JSON.parse(localStorage.getItem('tw_user')); } catch(_e) {}
+    if (!_user || !_user.id) {
+      showToast('⚠️ Not Logged In', 'Please log in before posting a listing.');
+      btn.innerHTML = originalText;
+      btn.disabled  = false;
+      return;
+    }
+
+    const fields = {
+      title:       (document.getElementById('accountName')        || {}).value || '',
+      description: (document.getElementById('accountDescription') || {}).value || '',
+      price:       Number((document.getElementById('accountPrice') || {}).value || 0),
+      currency:    'IQD',
+      category:    apiCategory,
+      tags:        tagsArr.join(','),
+      userId:      _user.id,            // ← required by backend
+    };
+
+    console.log('[DV] Posting listing:', fields);
+
+    try {
+      // POST directly as JSON — no file-server dependency
+      const response = await fetch('http://localhost:5001/api/products', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(fields),
+      });
+      const product = await response.json();
+      if (!response.ok) throw new Error(product.message || 'Server error ' + response.status);
+
+      console.log('[DV] Listing created:', product);
+      showToast('🎉 Listing Created!', 'Your account is now under review.');
       form.reset();
       document.querySelectorAll('.file-previews').forEach(p => p.innerHTML = '');
+      setTimeout(() => {
+        window.location.href = 'view.html?id=' + product.id;
+      }, 1200);
+    } catch (err) {
+      console.error('[DV] sell form submit:', err);
+      showToast('❌ Error', err.message || 'Could not submit listing. Please try again.');
       btn.innerHTML = originalText;
-      btn.disabled = false;
-    }, 1400);
+      btn.disabled  = false;
+    }
   });
 })();
 

@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Company Listings — DIGIVAULT</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='16' fill='%230ea5e9'/><text x='50%25' y='62%25' text-anchor='middle' font-size='52' font-weight='900' fill='%2303080f' font-family='Arial'>DV</text></svg>" />
+  <style>
+    /* ── Company page hero ── */
+    .company-hero {
+      padding: 120px 5% 60px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .company-hero::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 50%; transform: translateX(-50%);
+      width: 600px; height: 400px;
+      background: radial-gradient(circle, rgba(14,165,233,0.1) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .company-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(14,165,233,0.12);
+      border: 1px solid rgba(14,165,233,0.35);
+      border-radius: 100px;
+      padding: 6px 16px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 20px;
+    }
+
+    /* ── Category filter tabs ── */
+    .company-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin: 32px auto 0;
+      flex-wrap: wrap;
+      max-width: 600px;
+    }
+    .co-tab {
+      padding: 10px 22px;
+      border-radius: 100px;
+      border: 1.5px solid rgba(14,165,233,0.25);
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: 'DM Sans', sans-serif;
+    }
+    .co-tab:hover, .co-tab.active {
+      border-color: var(--amber);
+      color: var(--amber);
+      background: rgba(14,165,233,0.08);
+    }
+
+    /* ── Company listing cards ── */
+    .company-listings {
+      max-width: 1100px;
+      margin: 50px auto 80px;
+      padding: 0 5%;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .co-card {
+      background: linear-gradient(135deg, rgba(15,32,53,0.3), rgba(6,13,28,0.55));
+      border: 1.5px solid rgba(14,165,233,0.3);
+      border-radius: 20px;
+      overflow: hidden;
+      transition: var(--transition);
+    }
+    .co-card:hover {
+      border-color: var(--amber);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+
+    /* Top image area */
+    .co-gallery {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap: 3px;
+      height: 200px;
+    }
+    .co-gallery-main {
+      grid-column: 1 / 3;
+      grid-row: 1 / 3;
+      background: linear-gradient(135deg, var(--brown-700), var(--brown-950));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 5rem;
+      border-radius: 0;
+      position: relative;
+    }
+    .co-gallery-thumb {
+      background: linear-gradient(135deg, rgba(15,32,53,0.6), rgba(6,13,28,0.8));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .co-gallery-thumb:hover { background: rgba(14,165,233,0.1); }
+    .co-official-badge {
+      position: absolute;
+      top: 14px; left: 14px;
+      background: var(--amber);
+      color: var(--brown-950);
+      font-size: 0.65rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 100px;
+    }
+
+    /* Card body */
+    .co-body {
+      padding: 28px 32px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 24px;
+      align-items: start;
+    }
+    .co-label {
+      font-size: 0.65rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 8px;
+    }
+    .co-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.6rem;
+      letter-spacing: 0.04em;
+      color: var(--cream);
+      margin-bottom: 10px;
+      line-height: 1.1;
+    }
+    .co-desc {
+      font-size: 0.86rem;
+      color: var(--text-muted);
+      line-height: 1.75;
+      margin-bottom: 16px;
+    }
+    .co-tags {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+    .co-tag {
+      background: rgba(14,165,233,0.1);
+      border: 1px solid rgba(14,165,233,0.22);
+      border-radius: 6px;
+      padding: 4px 12px;
+      font-size: 0.72rem;
+      color: var(--amber);
+    }
+
+    /* Info grid inside card */
+    .co-info-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .co-info-item {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 8px;
+      padding: 10px 12px;
+    }
+    .co-info-label {
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 3px;
+    }
+    .co-info-value {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--cream);
+    }
+
+    /* Video section */
+    .co-video {
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 0;
+    }
+    .co-video-header {
+      padding: 10px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      color: var(--amber);
+    }
+    .co-video-placeholder {
+      height: 140px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: var(--transition);
+      color: var(--text-muted);
+      font-size: 0.78rem;
+    }
+    .co-video-placeholder:hover { background: rgba(14,165,233,0.04); }
+    .co-play-btn {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: var(--amber);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      color: var(--brown-950);
+      transition: var(--transition);
+    }
+    .co-video-placeholder:hover .co-play-btn { background: var(--amber-lt); transform: scale(1.08); }
+
+    /* Right side price + CTA */
+    .co-cta {
+      min-width: 200px;
+      text-align: right;
+    }
+    .co-price-box {
+      background: rgba(14,165,233,0.08);
+      border: 1px solid rgba(14,165,233,0.25);
+      border-radius: 12px;
+      padding: 18px 20px;
+      margin-bottom: 14px;
+      text-align: center;
+    }
+    .co-price-label { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; }
+    .co-price-num { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; color: var(--amber); letter-spacing: 0.04em; line-height: 1; }
+    .co-price-curr { font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; }
+    .co-price-neg { display: inline-block; background: rgba(46,204,113,0.12); border: 1px solid rgba(46,204,113,0.3); color: #2ecc71; border-radius: 100px; padding: 2px 9px; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.06em; margin-top: 6px; }
+    .co-btn-view {
+      width: 100%;
+      padding: 12px;
+      background: transparent;
+      border: 1.5px solid var(--amber);
+      border-radius: 10px;
+      color: var(--amber);
+      font-weight: 700;
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: var(--transition);
+      margin-bottom: 10px;
+    }
+    .co-btn-view:hover { background: rgba(14,165,233,0.1); }
+    .co-btn-buy {
+      width: 100%;
+      padding: 12px;
+      background: var(--amber);
+      border: none;
+      border-radius: 10px;
+      color: var(--brown-950);
+      font-weight: 700;
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .co-btn-buy:hover { background: var(--amber-lt); transform: translateY(-1px); }
+
+    /* Warning in buy modal */
+    .buy-modal-overlay { position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:9990;display:none;align-items:center;justify-content:center;padding:20px; }
+    .buy-modal-overlay.open { display:flex; }
+    .buy-modal { background:var(--brown-900);border:1px solid var(--card-bdr);border-radius:20px;padding:40px;max-width:500px;width:100%;text-align:center;animation:slideUp 0.3s ease; }
+    @keyframes slideUp { from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)} }
+    .bm-icon { font-size:3rem;margin-bottom:14px; }
+    .bm-title { font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:.06em;color:var(--amber);margin-bottom:12px; }
+    .bm-text { font-size:0.85rem;color:var(--text-muted);line-height:1.75;margin-bottom:20px; }
+    .bm-actions { display:flex;gap:10px;justify-content:center;flex-wrap:wrap; }
+    .bm-btn { display:flex;align-items:center;gap:7px;padding:11px 20px;border-radius:10px;font-size:0.86rem;font-weight:600;cursor:pointer;transition:var(--transition);text-decoration:none; }
+    .bm-tg { background:rgba(0,136,204,0.15);border:1.5px solid rgba(0,136,204,0.4);color:#22a3dc; }
+    .bm-tg:hover { background:rgba(0,136,204,0.25); }
+    .bm-dc { background:rgba(88,101,242,0.15);border:1.5px solid rgba(88,101,242,0.4);color:#7289da; }
+    .bm-dc:hover { background:rgba(88,101,242,0.25); }
+    .bm-cancel { background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.1);color:var(--text-muted); }
+    .bm-cancel:hover { border-color:rgba(255,255,255,0.2);color:var(--cream); }
+
+    @media(max-width:800px) {
+      .co-gallery { grid-template-columns:1fr 1fr; height:160px; }
+      .co-gallery-main { grid-column:1/3;grid-row:1/2; }
+      .co-body { grid-template-columns:1fr; }
+      .co-cta { text-align:left; min-width:unset; }
+      .co-info-grid { grid-template-columns:repeat(2,1fr); }
+    }
+    @media(max-width:480px) {
+      .co-info-grid { grid-template-columns:1fr 1fr; }
+      .co-gallery { height:130px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar" role="navigation">
+    <a href="index.html" class="nav-logo">
+      <div class="logo-icon" style="font-family:'Bebas Neue',sans-serif;font-size:.78rem;font-weight:900;letter-spacing:.04em;">DV</div>
+      DIGI<span>VAULT</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="market.html">Accounts</a></li>
+      <li><a href="index.html#contact">Contact</a></li>
+      <li><a href="market.html" class="nav-cta">Marketplace</a></li>
+    </ul>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <button onclick="openAccountPage()" title="My Account" style="width:40px;height:40px;border-radius:50%;background:rgba(29,110,255,.12);border:1.5px solid rgba(29,110,255,.32);display:flex;align-items:center;justify-content:center;font-size:1.15rem;cursor:pointer;transition:var(--transition);flex-shrink:0;" onmouseover="this.style.background='rgba(29,110,255,.22)';this.style.borderColor='var(--amber)'" onmouseout="this.style.background='rgba(29,110,255,.12)';this.style.borderColor='rgba(29,110,255,.32)'">👤</button>
+      <div id="lang-switcher"></div>
+      <button class="hamburger" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+  <nav class="mobile-menu">
+    <a href="index.html">Home</a>
+    <a href="market.html">Accounts</a>
+    <a href="index.html#contact">Contact</a>
+    <a href="javascript:openAccountPage()">👤 My Account</a>
+  </nav>
+
+  <!-- BUY WARNING MODAL -->
+  <div class="buy-modal-overlay" id="buyModal" onclick="if(event.target===this)closeBuy()">
+    <div class="buy-modal">
+      <div class="bm-icon">⚠️</div>
+      <div class="bm-title">Before You Continue</div>
+      <div class="bm-text">
+        <strong style="color:var(--amber);display:block;margin-bottom:8px;">DIGIVAULT does not handle payments directly.</strong>
+        All deals are arranged between buyer and seller. Verify the seller before sharing any information or making any payment. Proceed at your own risk.
+      </div>
+      <p style="font-size:0.8rem;color:var(--text-muted);background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:12px;margin-bottom:18px;">
+        Contact the seller directly via their channel:
+      </p>
+      <div class="bm-actions">
+        <a href="#" class="bm-btn bm-tg">✈️ Telegram</a>
+        <a href="#" class="bm-btn bm-dc">💬 Discord</a>
+        <button class="bm-btn bm-cancel" onclick="closeBuy()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE HERO -->
+  <div class="company-hero">
+    <div class="company-badge">🏢 Official Company Listings</div>
+    <h1 class="section-title" style="font-size:clamp(2rem,4.5vw,3.6rem);">Company Accounts &amp; Templates</h1>
+    <p class="section-sub" style="margin:14px auto 0;text-align:center;max-width:560px;">
+      These listings are maintained, verified, and backed directly by the DIGIVAULT team. Every purchase includes post-transfer support.
+    </p>
+
+    <!-- Category tabs -->
+    <div class="company-tabs">
+      <button class="co-tab active" onclick="filterCompany(this,'all')">All</button>
+      <button class="co-tab" onclick="filterCompany(this,'game')">🎮 Game Accounts</button>
+      <button class="co-tab" onclick="filterCompany(this,'web')">🌐 Website Templates</button>
+      <button class="co-tab" onclick="filterCompany(this,'canva')">🎨 Canva Templates</button>
+    </div>
+  </div>
+
+  <!-- COMPANY LISTINGS -->
+  <div class="company-listings" id="companyListings">
+
+    <!-- ── GAME: PUBG Conqueror ── -->
+    <div class="co-card reveal" data-co-cat="game">
+      <div class="co-gallery">
+        <div class="co-gallery-main">
+          ⚡
+          <span class="co-official-badge">⭐ Official</span>
+        </div>
+        <div class="co-gallery-thumb">🪖</div>
+        <div class="co-gallery-thumb">🔫</div>
+        <div class="co-gallery-thumb">🏆</div>
+        <div class="co-gallery-thumb">🎖️</div>
+      </div>
+      <div class="co-body">
+        <div>
+          <div class="co-label">Company Account · 🎮 PUBG</div>
+          <div class="co-title">Elite Conqueror Pack</div>
+          <div class="co-desc">Top-tier PUBG account maintained and verified directly by the DIGIVAULT team. Includes a 7-day post-transfer warranty and dedicated seller support. Conqueror rank, full skin collection, and rare seasonal items included.</div>
+          <div class="co-tags">
+            <span class="co-tag">👑 Conqueror</span>
+            <span class="co-tag">🔫 All Skins</span>
+            <span class="co-tag">🎖️ Classic Titles</span>
+            <span class="co-tag">✅ 7-Day Warranty</span>
+            <span class="co-tag">⚡ Fast Transfer</span>
+          </div>
+          <div class="co-info-grid">
+            <div class="co-info-item">
+              <div class="co-info-label">Account ID</div>
+              <div class="co-info-value">512-COMP-01</div>
+            </div>
+            <div class="co-info-item">
+              <div class="co-info-label">Level</div>
+              <div class="co-info-value">88</div>
+            </div>
+            <div class="co-info-item">
+              <div class="co-info-label">Collections</div>
+              <div class="co-info-value">203 items</div>
+            </div>
+          </div>
+          <div class="co-video">
+            <div class="co-video-header">🎥 Account Preview Video</div>
+            <div class="co-video-placeholder" onclick="this.innerHTML='<div style=\'color:var(--text-muted);font-size:.82rem;padding:20px;\'>🎥 Video would play here in the live version</div>'">
+              <div class="co-play-btn">▶</div>
+              <span>Click to preview account (max 2 min)</span>
+            </div>
+          </div>
+        </div>
+        <div class="co-cta">
+          <div class="co-price-box">
+            <div class="co-price-label">Asking Price</div>
+            <div class="co-price-num">780,000</div>
+            <div class="co-price-curr">IQD</div>
+            <div class="co-price-neg">✓ Negotiable</div>
+          </div>
+          <button class="co-btn-view" onclick="goViewFull('⚡','Elite Conqueror Pack','780,000 IQD','Level 88 · Conqueror · 203 items','Top-tier PUBG account maintained by DIGIVAULT team. Includes 7-day warranty, all gun skins, and legendary outfits.','🎮 PUBG','👑 Conqueror','512-COMP-01','88','203 items')">View Details</button>
+          <button class="co-btn-buy" onclick="openBuy()">💬 Buy This Account</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── GAME: EA Football ── -->
+    <div class="co-card reveal" data-co-cat="game">
+      <div class="co-gallery">
+        <div class="co-gallery-main">
+          ⚽
+          <span class="co-official-badge">⭐ Official</span>
+        </div>
+        <div class="co-gallery-thumb">🏟️</div>
+        <div class="co-gallery-thumb">🥇</div>
+        <div class="co-gallery-thumb">💰</div>
+        <div class="co-gallery-thumb">📊</div>
+      </div>
+      <div class="co-body">
+        <div>
+          <div class="co-label">Company Account · ⚽ EA Football</div>
+          <div class="co-title">Pro Division Bundle</div>
+          <div class="co-desc">High-rated EA FC account with a full 90+ squad, massive coin balance, and Division 1 history. Company-backed with guaranteed safe transfer and 7-day support window.</div>
+          <div class="co-tags">
+            <span class="co-tag">⚽ Division 1</span>
+            <span class="co-tag">💰 500K+ Coins</span>
+            <span class="co-tag">⭐ 90+ Rated Squad</span>
+            <span class="co-tag">✅ 7-Day Warranty</span>
+          </div>
+          <div class="co-info-grid">
+            <div class="co-info-item">
+              <div class="co-info-label">Account ID</div>
+              <div class="co-info-value">EA-COMP-01</div>
+            </div>
+            <div class="co-info-item">
+              <div class="co-info-label">Division</div>
+              <div class="co-info-value">Division 1</div>
+            </div>
+            <div class="co-info-item">
+              <div class="co-info-label">Coins</div>
+              <div class="co-info-value">500K+</div>
+            </div>
+          </div>
+          <div class="co-video">
+            <div class="co-video-header">🎥 Account Preview Video</div>
+            <div class="co-video-placeholder" onclick="this.innerHTML='<div style=\'color:var(--text-muted);font-size:.82rem;padding:20px;\'>🎥 Video would play here in the live version</div>'">
+              <div class="co-play-btn">▶</div>
+              <span>Click to preview account (max 2 min)</span>
+            </div>
+          </div>
+        </div>
+        <div class="co-cta">
+          <div class="co-price-box">
+            <div class="co-price-label">Asking Price</div>
+            <div class="co-price-num">250,000</div>
+            <div class="co-price-curr">IQD</div>
+            <div class="co-price-neg">✓ Negotiable</div>
+          </div>
+          <button class="co-btn-view" onclick="goViewFull('⚽','Pro Division Bundle','250,000 IQD','EA FC · Division 1 · 500K+ Coins','High-rated EA FC account backed by DIGIVAULT. Full 90+ squad, massive coin balance, Division 1.','⚽ EA Football','📊 Division 1','EA-COMP-01','N/A','500K+ coins')">View Details</button>
+          <button class="co-btn-buy" onclick="openBuy()">💬 Buy This Account</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── WEBSITE TEMPLATE ── -->
+    <div class="co-card reveal" data-co-cat="web">
+      <div class="co-gallery">
+        <div class="co-gallery-main">
+          🌐
+          <span class="co-official-badge">⭐ Official</span>
+        </div>
+        <div class="co-gallery-thumb">⚛️</div>
+        <div class="co-gallery-thumb">🎨</div>
+        <div class="co-gallery-thumb">📱</div>
+        <div class="co-gallery-thumb">🖥️</div>
+      </div>
+      <div class="co-body">
+        <div>
+          <div class="co-label">Company Template · 🌐 Website</div>
+          <div class="co-title">Premium Web Bundle</div>
+          <div class="co-desc">A handcrafted collection of HTML, React, and WordPress templates built by our in-house design team. Clean, documented code with lifetime updates. Covers SaaS, portfolio, e-commerce, and dashboard layouts.</div>
+          <div class="co-tags">
+            <span class="co-tag">⚛️ React</span>
+            <span class="co-tag">🌐 HTML/CSS/JS</span>
+            <span class="co-tag">🖥️ WordPress</span>
+            <span class="co-tag">📱 Responsive</span>
+            <span class="co-tag">🔄 Lifetime Updates</span>
+          </div>
+          <div class="co-info-grid">
+            <div class="co-info-item">
+              <div class="co-info-label">Templates</div>
+              <div class="co-info-value">12 included</div>
+            </div>
+            <div class="co-info-item">
+              <div class="co-info-label">Frameworks</div>
+              <div class="co-info-value">React · WP · HTML</div>
+            </div>
+            <div class="co-info-item">
+              <div class="co-info-label">Support</div>
+              <div class="co-info-value">30 days</div>
+            </div>
+          </div>
+          <div class="co-video">
+            <div class="co-video-header">🎥 Template Preview</div>
+            <div class="co-video-placeholder" onclick="this.innerHTML='<div style=\'color:var(--text-muted);font-size:.82rem;padding:20px;\'>🎥 Video would play here in the live version</div>'">
+              <div class="co-play-btn">▶</div>
+              <span>Click to preview templates (max 2 min)</span>
+            </div>
+          </div>
+        </div>
+        <div class="co-cta">
+          <div class="co-price-box">
+            <div class="co-price-label">Asking Price</div>
+            <div class="co-price-num">150,000</div>
+            <div class="co-price-curr">IQD</div>
+            <div class="co-price-neg">✓ Negotiable</div>
+          </div>
+          <button class="co-btn-view" onclick="goViewFull('🌐','Premium Web Bundle','150,000 IQD','12 Templates · React · WP · HTML','Handcrafted website templates by the DIGIVAULT team. 12 templates, lifetime updates, 30-day support.','🌐 Website Template','🔄 Lifetime Updates','WEB-COMP-01','N/A','N/A')">View Details</button>
+          <button class="co-btn-buy" onclick="openBuy()">💬 Buy This Template</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── CANVA TEMPLATE ── -->
+    <div class="co-card reveal" data-co-cat="canva">
+      <div class="co-gallery">
+        <div class="co-gallery-main">
+          🎨
+          <span class="co-official-badge">⭐ Official</span>
+        </div>
+        <div class="co-gallery-thumb">📱</div>
+        <div class="co-gallery-thumb">📊</div>
+        <div class="co-gallery-thumb">🖼️</div>
+        <div class="co-gallery-thumb">🎯</div>
+      </div>
+      <div class="co-body">
+        <div>
+          <div class="co-label">Company Template · 🎨 Canva</div>
+          <div class="co-title">Design Mega Pack</div>
+          <div class="co-desc">100+ premium Canva templates covering social media posts, stories, business presentations, brand kits, and marketing materials. Designed by professionals, fully editable, and compatible with all Canva plans.</div>
+          <div class="co-tags">
+            <span class="co-tag">📱 Social Media</span>
+            <span class="co-tag">📊 Business</span>
+            <span class="co-tag">🖼️ Stories</span>
+            <span class="co-tag">100+ Designs</span>
+            <span class="co-tag">✏️ Fully Editable</span>
+          </div>
+          <div class="co-info-grid">
+            <div class="co-info-item">
+              <div class="co-info-label">Templates</div>
+              <div class="co-info-value">100+</div>
+            </div>
+            <div class="co-info-item">
+              <div class="co-info-label">Categories</div>
+              <div class="co-info-value">5 types</div>
+            </div>
+            <div class="co-info-item">
+              <div class="co-info-label">Format</div>
+              <div class="co-info-value">All sizes</div>
+            </div>
+          </div>
+          <div class="co-video">
+            <div class="co-video-header">🎥 Design Preview</div>
+            <div class="co-video-placeholder" onclick="this.innerHTML='<div style=\'color:var(--text-muted);font-size:.82rem;padding:20px;\'>🎥 Video would play here in the live version</div>'">
+              <div class="co-play-btn">▶</div>
+              <span>Click to preview designs (max 2 min)</span>
+            </div>
+          </div>
+        </div>
+        <div class="co-cta">
+          <div class="co-price-box">
+            <div class="co-price-label">Asking Price</div>
+            <div class="co-price-num">75,000</div>
+            <div class="co-price-curr">IQD</div>
+            <div class="co-price-neg">✓ Negotiable</div>
+          </div>
+          <button class="co-btn-view" onclick="goViewFull('🎨','Design Mega Pack','75,000 IQD','100+ Canva Templates · 5 Categories','100+ premium Canva templates by the DIGIVAULT team. Social media, business, and more. All editable.','🎨 Canva Template','100+ Designs','CANVA-COMP-01','N/A','N/A')">View Details</button>
+          <button class="co-btn-buy" onclick="openBuy()">💬 Buy This Pack</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end .company-listings -->
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-bottom">
+        <p class="footer-copy">© 2025 DIGIVAULT. All rights reserved.</p>
+        <div class="footer-social">
+          <a href="#" class="social-btn">💬</a>
+          <a href="#" class="social-btn">✈️</a>
+          <a href="#" class="social-btn">𝕏</a>
+        </div>
+      </div>
+    </div>
+    <div id="lang-switcher"></div>
+  </footer>
+
+  <script src="i18n.js"></script>
+  <script src="script.js"></script>
+  <script>
+    function openAccountPage() {
+      window.location.href = null ? 'account.html' : 'login.html';
+    }
+
+    function openBuy() {
+      document.getElementById('buyModal').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeBuy() {
+      document.getElementById('buyModal').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    function goViewFull(icon, name, price, meta, desc, tag1, tag2, id, level, collections) {
+      sessionStorage.setItem('tw_view_listing', JSON.stringify({
+        icon: icon, name: name, price: price, meta: meta, desc: desc,
+        id: id, level: level, collections: collections,
+        tags: [tag1, tag2], category: tag1
+      }));
+      window.location.href = 'view.html';
+    }
+
+    function filterCompany(btn, cat) {
+      document.querySelectorAll('.co-tab').forEach(function(t) { t.classList.remove('active'); });
+      btn.classList.add('active');
+      document.querySelectorAll('.co-card').forEach(function(card) {
+        var cardCat = card.dataset.coCat;
+        card.style.display = (cat === 'all' || cardCat === cat) ? '' : 'none';
+      });
+    }
+  </script>
+  <script>
+    /* ── Theme toggle ── */
+    (function(){
+      if(localStorage.getItem('tw_theme')==='light')
+        document.body.classList.add('light-mode');
+    })();
+    function toggleTheme(){
+      var light = document.body.classList.toggle('light-mode');
+      localStorage.setItem('tw_theme', light ? 'light' : 'dark');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <!-- ⚑ BLOCKING AUTH GUARD — runs before ANY CSS or HTML paints -->
+  <script>
+    (function() {
+      // Migrate old sessionStorage data → localStorage (one-time fix)
+      var old = null/* sessionStorage removed */;
+      if (old && !localStorage.getItem('tw_user')) {
+        localStorage.setItem('tw_user', old);
+        sessionStorage.removeItem('tw_user');
+      }
+      // Redirect immediately if not logged in — prevents any page flash
+      if (!localStorage.getItem('tw_user')) {
+        window.location.replace('login.html');
+      }
+    })();
+  </script>
+  <!-- ↑ Must stay first in <head> -->
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>My Account — DIGIVAULT</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='16' fill='%230ea5e9'/><text x='50%25' y='62%25' text-anchor='middle' font-size='52' font-weight='900' fill='%2303080f' font-family='Arial'>DV</text></svg>"/>
+  <style>
+    /* ═══ LAYOUT ═══ */
+    .account-wrap {
+      display: grid;
+      grid-template-columns: 270px 1fr;
+      min-height: calc(100vh - 70px);
+      margin-top: 70px;
+    }
+
+    /* ═══ SIDEBAR ═══ */
+    .acct-sidebar {
+      background: linear-gradient(180deg, rgba(4,12,24,.98), rgba(8,18,36,.99));
+      border-right: 1px solid rgba(14,165,233,.13);
+      padding: 28px 0 20px;
+      position: sticky; top: 70px;
+      height: calc(100vh - 70px);
+      overflow-y: auto;
+      display: flex; flex-direction: column;
+      transition: transform .3s cubic-bezier(.4,0,.2,1);
+      z-index: 100;
+    }
+    .acct-sidebar::-webkit-scrollbar { width: 3px; }
+    .acct-sidebar::-webkit-scrollbar-thumb { background: rgba(14,165,233,.18); border-radius: 3px; }
+
+    /* Top block */
+    .sb-top { padding: 0 20px 22px; border-bottom: 1px solid rgba(14,165,233,.1); margin-bottom: 16px; text-align: center; }
+    .sb-av-wrap { display: inline-block; position: relative; margin-bottom: 11px; }
+    .sb-avatar {
+      width: 66px; height: 66px; border-radius: 50%;
+      background: linear-gradient(135deg,rgba(14,165,233,.22),rgba(2,132,199,.12));
+      border: 2.5px solid rgba(14,165,233,.38);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.85rem;
+      box-shadow: 0 0 0 5px rgba(14,165,233,.08);
+    }
+    .sb-online { position: absolute; bottom: 3px; right: 3px; width: 12px; height: 12px; border-radius: 50%; background: #22c55e; border: 2px solid #04080f; }
+    .sb-name-row { display: flex; align-items: center; justify-content: center; gap: 7px; margin-bottom: 7px; }
+    .sb-name { font-weight: 700; font-size: .94rem; color: var(--cream); }
+    .sb-edit-btn {
+      background: rgba(14,165,233,.14); border: 1px solid rgba(14,165,233,.28);
+      border-radius: 6px; padding: 3px 9px; font-size: .62rem; font-weight: 700;
+      color: #38bdf8; cursor: pointer; transition: var(--transition); white-space: nowrap;
+    }
+    .sb-edit-btn:hover { background: rgba(14,165,233,.26); }
+    .sb-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: linear-gradient(135deg,rgba(245,158,11,.16),rgba(230,160,32,.08));
+      border: 1px solid rgba(245,158,11,.32); color: #f59e0b;
+      border-radius: 100px; padding: 3px 12px;
+      font-size: .68rem; font-weight: 700; letter-spacing: .06em;
+    }
+
+    /* Coins row */
+    .sb-coins {
+      margin: 0 14px 18px;
+      background: linear-gradient(135deg,rgba(14,165,233,.09),rgba(2,132,199,.05));
+      border: 1px solid rgba(14,165,233,.2); border-radius: 12px;
+      padding: 12px 15px; display: flex; align-items: center; gap: 10px;
+    }
+    .sb-coin-icon { font-size: 1.5rem; line-height: 1; }
+    .sb-coin-info { flex: 1; min-width: 0; }
+    .sb-coin-num { font-family: 'Bebas Neue',sans-serif; font-size: 1.3rem; color: #f59e0b; line-height: 1; }
+    .sb-coin-lbl { font-size: .6rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: .09em; }
+    .sb-buy-btn {
+      background: linear-gradient(135deg,#0ea5e9,#0284c7); color: #fff;
+      border: none; border-radius: 8px; padding: 6px 12px;
+      font-size: .7rem; font-weight: 700; cursor: pointer;
+      transition: var(--transition); white-space: nowrap;
+      box-shadow: 0 2px 8px rgba(14,165,233,.3);
+    }
+    .sb-buy-btn:hover { background: linear-gradient(135deg,#38bdf8,#0ea5e9); transform: translateY(-1px); }
+
+    /* Nav items */
+    .sb-nav { padding: 0 10px; }
+    .sb-nav-lbl { padding: 0 10px 5px; font-size: .58rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: rgba(14,165,233,.38); margin-top: 4px; }
+    .sb-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 13px; border-radius: 10px;
+      font-size: .87rem; font-weight: 500; color: var(--text-muted);
+      cursor: pointer; transition: var(--transition); margin-bottom: 2px;
+    }
+    .sb-item:hover { background: rgba(14,165,233,.07); color: var(--cream); }
+    .sb-item.active { background: linear-gradient(135deg,rgba(14,165,233,.16),rgba(2,132,199,.08)); color: #38bdf8; font-weight: 600; box-shadow: inset 3px 0 0 #0ea5e9; }
+    .sb-item-icon { width: 32px; height: 32px; border-radius: 8px; background: rgba(255,255,255,.04); display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; transition: var(--transition); }
+    .sb-item.active .sb-item-icon, .sb-item:hover .sb-item-icon { background: rgba(14,165,233,.15); }
+
+    /* Post listing CTA */
+    .sb-post-btn {
+      margin: 12px 14px 0;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 12px;
+      background: linear-gradient(135deg,rgba(14,165,233,.14),rgba(2,132,199,.07));
+      border: 1.5px solid rgba(14,165,233,.28); border-radius: 10px;
+      color: #38bdf8; font-size: .84rem; font-weight: 700; cursor: pointer; transition: var(--transition);
+    }
+    .sb-post-btn:hover { background: linear-gradient(135deg,rgba(14,165,233,.24),rgba(2,132,199,.14)); border-color: var(--amber); color: var(--amber); transform: translateY(-1px); }
+
+    /* Bottom / logout */
+    .sb-bottom { margin-top: auto; padding: 14px 14px 0; }
+    .sb-logout {
+      width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 11px; background: rgba(239,68,68,.06); border: 1px solid rgba(239,68,68,.18);
+      border-radius: 10px; color: rgba(239,68,68,.75); font-size: .82rem; font-weight: 600; cursor: pointer; transition: var(--transition);
+    }
+    .sb-logout:hover { background: rgba(239,68,68,.13); color: #ef4444; }
+
+    /* Mobile FAB — hidden on desktop */
+    .sidebar-fab {
+      display: none;
+      position: fixed; bottom: 22px; right: 20px;
+      width: 50px; height: 50px; border-radius: 50%;
+      background: linear-gradient(135deg,#0ea5e9,#0284c7);
+      border: none; cursor: pointer;
+      box-shadow: 0 4px 20px rgba(14,165,233,.45);
+      font-size: 1.3rem; color: #fff; z-index: 1001;
+      align-items: center; justify-content: center;
+      transition: var(--transition);
+    }
+    .sidebar-fab:hover { transform: scale(1.08); }
+
+    /* Mobile backdrop */
+    .sb-backdrop {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.55); z-index: 999;
+      backdrop-filter: blur(3px);
+    }
+    .sb-backdrop.open { display: block; }
+
+    /* ═══ MAIN CONTENT ═══ */
+    .acct-main { padding: 32px 40px; overflow-y: auto; scroll-behavior: smooth; }
+    .acct-panel { display: none; }
+    .acct-panel.active { display: block; }
+
+    .panel-hdr { margin-bottom: 24px; padding-bottom: 17px; border-bottom: 1px solid rgba(14,165,233,.1); }
+    .panel-hdr h1 { font-family: 'Bebas Neue',sans-serif; font-size: 1.9rem; letter-spacing: .06em; color: var(--cream); margin-bottom: 4px; }
+    .panel-hdr p { font-size: .83rem; color: var(--text-muted); }
+
+    /* Stats */
+    .stats-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 13px; margin-bottom: 24px; }
+    .stat-card { background: linear-gradient(135deg,rgba(14,165,233,.07),rgba(255,255,255,.03)); border: 1px solid rgba(14,165,233,.15); border-radius: 13px; padding: 19px; transition: var(--transition); }
+    .stat-card:hover { border-color: rgba(14,165,233,.3); transform: translateY(-2px); }
+    .stat-card .sc-icon { font-size: 1.4rem; margin-bottom: 9px; }
+    .stat-card .sc-num { font-family: 'Bebas Neue',sans-serif; font-size: 2rem; color: var(--amber); letter-spacing: .04em; line-height: 1; }
+    .stat-card .sc-lbl { font-size: .68rem; color: var(--text-muted); letter-spacing: .07em; text-transform: uppercase; margin-top: 4px; }
+
+    /* Section heading */
+    .section-heading { font-family: 'Bebas Neue',sans-serif; font-size: 1rem; letter-spacing: .08em; color: var(--amber); margin-bottom: 13px; }
+
+    /* My Tools */
+    .tools-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-bottom: 22px; }
+    .tool-card { background: linear-gradient(135deg,rgba(14,165,233,.07),rgba(2,132,199,.03)); border: 1px solid rgba(14,165,233,.15); border-radius: 15px; padding: 22px 18px; text-align: center; cursor: pointer; transition: var(--transition); position: relative; overflow: hidden; }
+    .tool-card::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg,#0ea5e9,#38bdf8); transform: scaleX(0); transform-origin: left; transition: transform var(--transition); }
+    .tool-card:hover { border-color: rgba(14,165,233,.38); transform: translateY(-4px); box-shadow: 0 12px 30px rgba(14,165,233,.1); }
+    .tool-card:hover::after { transform: scaleX(1); }
+    .tool-icon { font-size: 2rem; margin-bottom: 11px; display: block; }
+    .tool-title { font-family: 'Bebas Neue',sans-serif; font-size: 1rem; letter-spacing: .05em; color: var(--cream); margin-bottom: 4px; }
+    .tool-desc { font-size: .73rem; color: var(--text-muted); line-height: 1.55; }
+
+    /* Activity */
+    .activity-box { background: var(--card-bg); border: 1px solid var(--card-bdr); border-radius: 14px; padding: 20px; }
+    .activity-box-title { font-family: 'Bebas Neue',sans-serif; font-size: .95rem; letter-spacing: .08em; color: var(--amber); margin-bottom: 13px; }
+    .act-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,.04); font-size: .81rem; color: var(--text-muted); }
+    .act-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .act-item strong { color: var(--cream); }
+    .act-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--amber); flex-shrink: 0; }
+
+    /* Post listing panel */
+    .post-panel-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 18px; margin-bottom: 22px; }
+    .post-big-card { background: linear-gradient(145deg,rgba(14,165,233,.07),rgba(2,132,199,.03)); border: 1.5px solid rgba(14,165,233,.16); border-radius: 18px; padding: 30px 22px; cursor: pointer; transition: var(--transition); display: flex; flex-direction: column; position: relative; overflow: hidden; }
+    .post-big-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg,#0ea5e9,#38bdf8); transform: scaleX(0); transform-origin: left; transition: transform var(--transition); }
+    .post-big-card:hover { border-color: rgba(14,165,233,.4); transform: translateY(-5px); box-shadow: 0 16px 40px rgba(14,165,233,.12); }
+    .post-big-card:hover::before { transform: scaleX(1); }
+    .pbc-icon { font-size: 2.6rem; margin-bottom: 14px; }
+    .pbc-title { font-family: 'Bebas Neue',sans-serif; font-size: 1.2rem; letter-spacing: .06em; color: var(--cream); margin-bottom: 8px; }
+    .pbc-desc { font-size: .8rem; color: var(--text-muted); line-height: 1.65; margin-bottom: 14px; flex: 1; }
+    .pbc-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 16px; }
+    .pbc-tags span { background: rgba(14,165,233,.1); border: 1px solid rgba(14,165,233,.2); border-radius: 5px; padding: 2px 9px; font-size: .67rem; color: var(--amber); }
+    .pbc-arrow { font-size: 1.2rem; color: var(--text-muted); transition: var(--transition); }
+    .post-big-card:hover .pbc-arrow { color: var(--amber); transform: translateX(4px); }
+    .post-panel-note { display: flex; align-items: center; gap: 10px; background: rgba(245,158,11,.07); border: 1px solid rgba(245,158,11,.18); border-radius: 10px; padding: 13px 16px; font-size: .8rem; color: var(--text-muted); }
+    .post-panel-note strong { color: #f59e0b; }
+
+    /* Profile form */
+    .profile-form { background: var(--card-bg); border: 1px solid var(--card-bdr); border-radius: 16px; padding: 26px; max-width: 580px; }
+    .av-edit { display: flex; align-items: center; gap: 18px; margin-bottom: 22px; }
+    .av-big { width: 70px; height: 70px; border-radius: 50%; background: rgba(14,165,233,.15); border: 2px solid var(--card-bdr); display: flex; align-items: center; justify-content: center; font-size: 2rem; }
+    .av-btn { background: rgba(14,165,233,.1); border: 1.5px solid rgba(14,165,233,.3); color: var(--amber); border-radius: 8px; padding: 7px 15px; font-size: .81rem; font-weight: 600; cursor: pointer; transition: var(--transition); }
+    .av-btn:hover { background: rgba(14,165,233,.18); }
+    .pf-row { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; margin-bottom: 14px; }
+    .pf-lbl { font-size: .69rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 6px; }
+    .pf-inp { width: 100%; background: rgba(255,255,255,.04); border: 1.5px solid rgba(255,255,255,.08); border-radius: 8px; padding: 10px 13px; font-size: .88rem; color: var(--cream); outline: none; font-family: 'DM Sans',sans-serif; transition: var(--transition); }
+    .pf-inp:focus { border-color: var(--amber); background: rgba(14,165,233,.04); }
+
+    /* Listings */
+    .listing-item { background: var(--card-bg); border: 1px solid rgba(14,165,233,.1); border-radius: 12px; padding: 15px 17px; display: flex; align-items: center; gap: 13px; margin-bottom: 9px; transition: var(--transition); }
+    .listing-item:hover { border-color: rgba(14,165,233,.24); }
+    .l-icon { width: 44px; height: 44px; border-radius: 10px; background: rgba(14,165,233,.1); display: flex; align-items: center; justify-content: center; font-size: 1.25rem; flex-shrink: 0; }
+    .l-name { font-weight: 700; font-size: .9rem; color: var(--cream); margin-bottom: 3px; }
+    .l-meta { font-size: .72rem; color: var(--text-muted); }
+    .l-status { font-size: .63rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 3px 9px; border-radius: 100px; }
+    .l-status.active  { background: rgba(34,197,94,.12); border: 1px solid rgba(34,197,94,.3);  color: #22c55e; }
+    .l-status.pending { background: rgba(245,158,11,.12); border: 1px solid rgba(245,158,11,.3); color: #f59e0b; }
+    .l-price { font-family: 'Bebas Neue',sans-serif; font-size: 1rem; color: var(--amber); margin-left: 5px; white-space: nowrap; }
+    .l-acts { display: flex; gap: 5px; }
+    .l-acts button { background: none; border: 1px solid rgba(255,255,255,.1); border-radius: 6px; padding: 5px 9px; color: var(--text-muted); font-size: .71rem; font-weight: 600; cursor: pointer; transition: var(--transition); }
+    .l-acts button:hover { border-color: var(--amber); color: var(--amber); }
+    .l-acts .promote { background: rgba(14,165,233,.08); border-color: rgba(14,165,233,.28); color: var(--amber); }
+
+    /* DV Coins panel */
+    .coins-bal { display: flex; align-items: center; gap: 18px; background: linear-gradient(135deg,rgba(14,165,233,.1),rgba(21,48,80,.15)); border: 1.5px solid rgba(14,165,233,.25); border-radius: 15px; padding: 22px 26px; margin-bottom: 22px; }
+    .bal-num { font-family: 'Bebas Neue',sans-serif; font-size: 2.8rem; color: var(--amber); line-height: 1; letter-spacing: .04em; }
+    .bal-lbl { font-size: .78rem; color: var(--text-muted); letter-spacing: .08em; text-transform: uppercase; }
+    .pkg-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 11px; margin-bottom: 18px; }
+    .coin-pkg { background: var(--card-bg); border: 1.5px solid rgba(14,165,233,.15); border-radius: 12px; padding: 18px 13px; text-align: center; cursor: pointer; transition: var(--transition); }
+    .coin-pkg:hover, .coin-pkg.selected { border-color: var(--amber); background: rgba(14,165,233,.07); }
+    .pkg-amount { font-family: 'Bebas Neue',sans-serif; font-size: 1.7rem; color: var(--amber); }
+    .pkg-label  { font-size: .68rem; color: var(--text-muted); margin-bottom: 7px; }
+    .pkg-price  { font-size: .78rem; font-weight: 700; color: var(--cream); }
+    .pkg-badge  { display: inline-block; background: rgba(34,197,94,.15); border: 1px solid rgba(34,197,94,.3); color: #22c55e; border-radius: 100px; padding: 2px 7px; font-size: .6rem; font-weight: 800; margin-top: 4px; }
+    .coin-uses  { display: flex; flex-direction: column; gap: 9px; }
+    .coin-use-item { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.06); border-radius: 10px; padding: 13px 14px; }
+    .cul { font-size: .85rem; color: var(--cream); font-weight: 500; }
+    .cud { font-size: .72rem; color: var(--text-muted); margin-top: 2px; }
+    .cu-btn { background: rgba(14,165,233,.12); border: 1.5px solid rgba(14,165,233,.3); color: var(--amber); border-radius: 7px; padding: 7px 13px; font-size: .77rem; font-weight: 700; cursor: pointer; transition: var(--transition); white-space: nowrap; }
+    .cu-btn:hover { background: rgba(14,165,233,.22); }
+
+    /* My Level */
+    .lp-wrap    { margin-bottom: 20px; }
+    .lp-labels  { display: flex; justify-content: space-between; font-size: .73rem; color: var(--text-muted); margin-bottom: 7px; }
+    .lp-bar     { height: 8px; background: rgba(255,255,255,.06); border-radius: 100px; overflow: hidden; }
+    .lp-fill    { height: 100%; background: linear-gradient(to right,#0ea5e9,#38bdf8); border-radius: 100px; transition: width 1s ease; }
+    .lvl-timeline { display: flex; flex-direction: column; gap: 11px; }
+    .lvl-tier   { display: flex; align-items: center; gap: 13px; background: var(--card-bg); border: 1px solid rgba(255,255,255,.07); border-radius: 11px; padding: 13px 17px; }
+    .lvl-tier.current { border-color: var(--amber); background: rgba(14,165,233,.06); }
+    .ti-icon    { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+    .ti-bronze  { background: rgba(205,127,50,.15); }
+    .ti-silver  { background: rgba(192,192,192,.12); }
+    .ti-gold    { background: rgba(14,165,233,.15); }
+    .ti-plat    { background: rgba(100,200,255,.1); }
+    .tier-name  { font-family: 'Bebas Neue',sans-serif; font-size: .96rem; letter-spacing: .06em; color: var(--cream); }
+    .tier-req   { font-size: .72rem; color: var(--text-muted); margin-top: 2px; }
+    .current-tag { margin-left: auto; background: var(--amber); color: var(--brown-950); border-radius: 100px; padding: 2px 9px; font-size: .63rem; font-weight: 800; }
+
+    /* Buy Coins Modal */
+    .coins-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.8); z-index: 9990; display: none; align-items: center; justify-content: center; padding: 20px; }
+    .coins-modal-overlay.open { display: flex; }
+    .coins-modal { background: var(--brown-900); border: 1px solid var(--card-bdr); border-radius: 20px; padding: 34px; max-width: 450px; width: 100%; position: relative; animation: slideUp .3s ease; }
+    @keyframes slideUp { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+    .cm-close {
+      position: absolute; top: 13px; right: 13px;
+      background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1);
+      border-radius: 7px; width: 29px; height: 29px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--text-muted); font-size: .88rem;
+      transition: var(--transition);
+    }
+    .cm-close:hover { color: var(--amber); background: rgba(255,255,255,.12); }
+
+    /* ═══ LIGHT MODE ═══ */
+    body.light-mode .acct-sidebar  { background: linear-gradient(180deg,#f0f7ff,#e5f1fb) !important; border-right-color: rgba(2,132,199,.14) !important; }
+    body.light-mode .sb-top        { border-bottom-color: rgba(2,132,199,.12) !important; }
+    body.light-mode .sb-name       { color: #0c1a2e !important; }
+    body.light-mode .sb-badge      { background: rgba(245,158,11,.1) !important; border-color: rgba(245,158,11,.28) !important; }
+    body.light-mode .sb-coins      { background: rgba(14,165,233,.07) !important; border-color: rgba(14,165,233,.18) !important; }
+    body.light-mode .sb-coin-num   { color: #b45309 !important; }
+    body.light-mode .sb-coin-lbl   { color: #475569 !important; }
+    body.light-mode .sb-item       { color: #2d4a6a !important; }
+    body.light-mode .sb-item:hover { background: rgba(14,165,233,.08) !important; color: #0284c7 !important; }
+    body.light-mode .sb-item.active{ background: rgba(14,165,233,.12) !important; color: #0284c7 !important; box-shadow: inset 3px 0 0 #0284c7 !important; }
+    body.light-mode .sb-nav-lbl    { color: rgba(2,132,199,.45) !important; }
+    body.light-mode .sb-edit-btn   { background: rgba(14,165,233,.1) !important; border-color: rgba(14,165,233,.25) !important; color: #0284c7 !important; }
+    body.light-mode .sb-post-btn   { background: rgba(14,165,233,.08) !important; border-color: rgba(14,165,233,.22) !important; color: #0284c7 !important; }
+    body.light-mode .acct-main     { background: transparent; }
+    body.light-mode .panel-hdr h1  { color: #0c1a2e !important; }
+    body.light-mode .panel-hdr p   { color: #475569 !important; }
+    body.light-mode .panel-hdr     { border-bottom-color: rgba(2,132,199,.12) !important; }
+    body.light-mode .stat-card     { background: rgba(255,255,255,.88) !important; border-color: rgba(14,165,233,.18) !important; }
+    body.light-mode .stat-card .sc-lbl { color: #475569 !important; }
+    body.light-mode .section-heading   { color: #0284c7 !important; }
+    body.light-mode .tool-card     { background: rgba(255,255,255,.88) !important; border-color: rgba(14,165,233,.18) !important; }
+    body.light-mode .tool-title    { color: #0c1a2e !important; }
+    body.light-mode .tool-desc     { color: #475569 !important; }
+    body.light-mode .activity-box  { background: rgba(255,255,255,.88) !important; border-color: rgba(14,165,233,.18) !important; }
+    body.light-mode .activity-box-title { color: #0284c7 !important; }
+    body.light-mode .act-item      { color: #475569 !important; border-bottom-color: rgba(14,165,233,.1) !important; }
+    body.light-mode .act-item strong { color: #0c1a2e !important; }
+    body.light-mode .post-big-card { background: rgba(255,255,255,.88) !important; border-color: rgba(14,165,233,.18) !important; }
+    body.light-mode .pbc-title     { color: #0c1a2e !important; }
+    body.light-mode .pbc-desc      { color: #475569 !important; }
+    body.light-mode .profile-form  { background: rgba(255,255,255,.9) !important; border-color: rgba(14,165,233,.2) !important; }
+    body.light-mode .pf-lbl        { color: #475569 !important; }
+    body.light-mode .pf-inp        { background: #fff !important; border-color: rgba(14,165,233,.22) !important; color: #0c1a2e !important; }
+    body.light-mode .pf-inp::placeholder { color: #94a3b8 !important; }
+    body.light-mode .listing-item  { background: rgba(255,255,255,.88) !important; border-color: rgba(14,165,233,.14) !important; }
+    body.light-mode .l-name        { color: #0c1a2e !important; }
+    body.light-mode .l-meta        { color: #475569 !important; }
+    body.light-mode .l-acts button { border-color: rgba(14,165,233,.18) !important; color: #475569 !important; }
+    body.light-mode .coins-bal     { background: linear-gradient(135deg,rgba(14,165,233,.08),rgba(2,132,199,.04)) !important; }
+    body.light-mode .bal-lbl       { color: #475569 !important; }
+    body.light-mode .coin-pkg      { background: rgba(255,255,255,.88) !important; border-color: rgba(14,165,233,.18) !important; }
+    body.light-mode .pkg-label     { color: #475569 !important; }
+    body.light-mode .pkg-price     { color: #0c1a2e !important; }
+    body.light-mode .coin-use-item { background: rgba(255,255,255,.7) !important; border-color: rgba(14,165,233,.12) !important; }
+    body.light-mode .cul           { color: #0c1a2e !important; }
+    body.light-mode .cud           { color: #475569 !important; }
+    body.light-mode .lvl-tier      { background: rgba(255,255,255,.85) !important; border-color: rgba(14,165,233,.14) !important; }
+    body.light-mode .tier-name     { color: #0c1a2e !important; }
+    body.light-mode .tier-req      { color: #475569 !important; }
+    body.light-mode .lp-labels     { color: #475569 !important; }
+    body.light-mode .lp-bar        { background: rgba(14,165,233,.1) !important; }
+    body.light-mode .coins-modal   { background: #f0f7ff !important; }
+
+    /* ═══ MOBILE BOTTOM ACTION BAR ═══
+       Replaces the hidden sidebar on phones.
+       Always visible — Dashboard, Edit, Post, Listings, Logout.
+    ══════════════════════════════════ */
+    .mobile-actions {
+      display: none; /* desktop: hidden */
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: linear-gradient(180deg, rgba(4,12,24,.97), rgba(6,15,30,.99));
+      border-top: 1px solid rgba(14,165,233,.18);
+      padding: 6px 4px max(8px, env(safe-area-inset-bottom));
+      z-index: 600;
+      justify-content: space-around; align-items: flex-start;
+      box-shadow: 0 -4px 20px rgba(0,0,0,.35);
+    }
+    .mob-btn {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 3px; padding: 6px 10px; border-radius: 10px;
+      background: none; border: none; cursor: pointer;
+      color: var(--text-muted); transition: var(--transition);
+      flex: 1; max-width: 72px; min-width: 0;
+    }
+    .mob-btn:hover, .mob-btn:active { color: #38bdf8; background: rgba(14,165,233,.1); }
+    .mob-btn .mob-icon { font-size: 1.25rem; line-height: 1; }
+    .mob-btn .mob-lbl { font-size: .6rem; font-weight: 600; letter-spacing: .03em; white-space: nowrap; }
+    .mob-btn.mob-post {
+      color: #38bdf8;
+      background: rgba(14,165,233,.12);
+      border: 1px solid rgba(14,165,233,.25);
+    }
+    .mob-btn.mob-post:hover { background: rgba(14,165,233,.22); }
+    .mob-btn.mob-logout { color: rgba(239,68,68,.75); }
+    .mob-btn.mob-logout:hover { color: #ef4444; background: rgba(239,68,68,.1); }
+    /* Light mode */
+    body.light-mode .mobile-actions { background: linear-gradient(180deg,#eef5fd,#e5f0fb); border-top-color: rgba(2,132,199,.18); }
+    body.light-mode .mob-btn        { color: #475569; }
+    body.light-mode .mob-btn:hover  { color: #0284c7; background: rgba(14,165,233,.08); }
+    body.light-mode .mob-btn.mob-post { color: #0284c7; background: rgba(14,165,233,.1); border-color: rgba(14,165,233,.22); }
+
+    /* ═══ RESPONSIVE ═══ */
+    @media (max-width: 960px) {
+      .account-wrap { grid-template-columns: 1fr; }
+      .acct-sidebar {
+        position: fixed; left: 0; top: 70px;
+        width: 270px; height: calc(100vh - 70px);
+        transform: translateX(-100%);
+        box-shadow: 4px 0 32px rgba(0,0,0,.45);
+      }
+      .acct-sidebar.open { transform: translateX(0); }
+      /* Hide the ☰ FAB on mobile — replaced by bottom action bar */
+      .sidebar-fab { display: none !important; }
+      /* Show mobile action bar */
+      .mobile-actions { display: flex; }
+      /* Push main content up so bottom bar doesn't cover it */
+      .acct-main { padding: 22px 16px 90px; }
+      .stats-row { grid-template-columns: repeat(2,1fr); }
+      .tools-grid { grid-template-columns: repeat(2,1fr); }
+      .post-panel-grid { grid-template-columns: repeat(2,1fr); }
+      .pkg-grid { grid-template-columns: repeat(2,1fr); }
+    }
+    @media (max-width: 520px) {
+      .tools-grid { grid-template-columns: 1fr; }
+      .post-panel-grid { grid-template-columns: 1fr; }
+      .pkg-grid { grid-template-columns: 1fr; }
+      .pf-row { grid-template-columns: 1fr; }
+      .listing-item { flex-wrap: wrap; }
+      .l-acts { width: 100%; }
+      .coins-bal { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body style="visibility:hidden;">
+
+<!-- ══ NAVBAR ══ -->
+<nav class="navbar" role="navigation" style="position:fixed;">
+  <a href="index.html" class="nav-logo">
+    <div class="logo-icon" style="font-family:'Bebas Neue',sans-serif;font-size:.78rem;font-weight:900;letter-spacing:.04em;">DV</div>
+    DIGI<span>VAULT</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="market.html">Marketplace</a></li>
+  </ul>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <!-- Profile icon — global.js inserts coin badge right after this -->
+    <button onclick="openAccountPage()" title="My Account"
+      style="width:38px;height:38px;border-radius:50%;background:rgba(14,165,233,.12);border:1.5px solid rgba(14,165,233,.3);display:flex;align-items:center;justify-content:center;font-size:1.1rem;cursor:pointer;transition:var(--transition);"
+      onmouseover="this.style.background='rgba(14,165,233,.22)'"
+      onmouseout="this.style.background='rgba(14,165,233,.12)'">👤</button>
+    <!-- global.js injects 🪙 coin badge here automatically -->
+    <div id="lang-switcher"></div>
+    <button class="hamburger" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+<nav class="mobile-menu">
+  <a href="index.html">Home</a>
+  <a href="market.html">Marketplace</a>
+</nav>
+
+<!-- ══ BUY COINS MODAL ══ -->
+<div class="coins-modal-overlay" id="coinsModal" onclick="if(event.target===this)closeCoinsModal()">
+  <div class="coins-modal">
+    <button class="cm-close" onclick="closeCoinsModal()">✕</button>
+    <div style="text-align:center;margin-bottom:20px;">
+      <div style="font-size:2.3rem;margin-bottom:7px;">🪙</div>
+      <h2 style="font-family:'Bebas Neue',sans-serif;font-size:1.35rem;letter-spacing:.06em;color:var(--amber);">Buy DV Coins</h2>
+      <p style="font-size:.79rem;color:var(--text-muted);margin-top:5px;">Boost listings and level up faster</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">
+      <div onclick="selectModalPkg(this)" style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.03);border:1.5px solid rgba(255,255,255,.08);border-radius:10px;padding:12px 14px;cursor:pointer;transition:var(--transition);">
+        <div><div style="font-weight:600;color:var(--cream);font-size:.87rem;">🪙 10 DV Coins</div><div style="font-size:.72rem;color:var(--text-muted);">2× listing promotions</div></div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--amber);">5,000 IQD</div>
+      </div>
+      <div onclick="selectModalPkg(this)" style="display:flex;align-items:center;justify-content:space-between;background:rgba(14,165,233,.06);border:1.5px solid rgba(14,165,233,.35);border-radius:10px;padding:12px 14px;cursor:pointer;transition:var(--transition);">
+        <div><div style="font-weight:600;color:var(--cream);font-size:.87rem;">🪙 50 DV Coins <span style="background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:#22c55e;border-radius:100px;padding:1px 7px;font-size:.59rem;font-weight:800;margin-left:4px;">Best Value</span></div><div style="font-size:.72rem;color:var(--text-muted);">10× promotions</div></div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--amber);">20,000 IQD</div>
+      </div>
+      <div onclick="selectModalPkg(this)" style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.03);border:1.5px solid rgba(255,255,255,.08);border-radius:10px;padding:12px 14px;cursor:pointer;transition:var(--transition);">
+        <div><div style="font-weight:600;color:var(--cream);font-size:.87rem;">🪙 150 DV Coins</div><div style="font-size:.72rem;color:var(--text-muted);">30× promotions + level boost</div></div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--amber);">50,000 IQD</div>
+      </div>
+    </div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="buyCoinsPkg()">Complete Purchase →</button>
+    <p style="text-align:center;font-size:.68rem;color:var(--text-muted);margin-top:8px;">🔒 IQD payments only</p>
+  </div>
+</div>
+
+<!-- Mobile backdrop + FAB -->
+<div class="sb-backdrop" id="sbBackdrop" onclick="closeSidebar()"></div>
+<button class="sidebar-fab" id="sidebarFab" onclick="toggleSidebar()" title="Open menu">☰</button>
+
+<!-- ══ ACCOUNT LAYOUT ══ -->
+<div class="account-wrap">
+
+  <!-- SIDEBAR -->
+  <aside class="acct-sidebar" id="acctSidebar">
+
+    <!-- 1. Avatar + Name row (with ✏️ Edit) + Badge -->
+    <div class="sb-top">
+      <div class="sb-av-wrap">
+        <div class="sb-avatar">👤</div>
+        <div class="sb-online"></div>
+      </div>
+      <div class="sb-name-row">
+        <span class="sb-name" id="sidebarName">Loading…</span>
+        <button class="sb-edit-btn" onclick="switchPanel(null,'panel-profile')" title="Edit Profile">✏️ Edit</button>
+      </div>
+      <div class="sb-badge">🥇 Gold Seller</div>
+    </div>
+
+    <!-- 2. DV Coins + Buy -->
+    <div class="sb-coins">
+      <div class="sb-coin-icon">🪙</div>
+      <div class="sb-coin-info">
+        <div class="sb-coin-num" id="sidebarCoins">–</div>
+        <div class="sb-coin-lbl">DV Coins</div>
+      </div>
+      <button class="sb-buy-btn" onclick="openCoinsModal()">Buy +</button>
+    </div>
+
+    <!-- 3. Nav — Dashboard ONLY -->
+    <div class="sb-nav">
+      <div class="sb-nav-lbl">Account</div>
+      <div class="sb-item active" id="nav-dashboard" onclick="switchPanel(this,'panel-dashboard')">
+        <div class="sb-item-icon">📊</div>Dashboard
+      </div>
+    </div>
+
+    <!-- 4. Post Listing CTA -->
+    <button class="sb-post-btn" onclick="switchPanel(null,'panel-post')">➕ Post a Listing</button>
+
+    <!-- 5. Logout -->
+    <div class="sb-bottom">
+      <button class="sb-logout" onclick="doLogout()">🚪 Logout</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="acct-main" id="acctMain">
+
+    <!-- ══ DASHBOARD ══ -->
+    <div class="acct-panel active" id="panel-dashboard">
+      <div class="panel-hdr">
+        <h1>Dashboard</h1>
+        <p id="dashGreeting">Welcome back!</p>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-card"><div class="sc-icon">📋</div><div class="sc-num">3</div><div class="sc-lbl">Active Listings</div></div>
+        <div class="stat-card"><div class="sc-icon">💰</div><div class="sc-num">12</div><div class="sc-lbl">Total Sales</div></div>
+        <div class="stat-card"><div class="sc-icon">⭐</div><div class="sc-num">4.9</div><div class="sc-lbl">Rating</div></div>
+        <div class="stat-card"><div class="sc-icon">🪙</div><div class="sc-num" id="dashCoins">–</div><div class="sc-lbl">DV Coins</div></div>
+      </div>
+
+      <div class="section-heading">My Tools</div>
+      <div class="tools-grid">
+        <div class="tool-card" onclick="switchPanel(null,'panel-listings')">
+          <span class="tool-icon">📋</span>
+          <div class="tool-title">My Listings</div>
+          <div class="tool-desc">Manage and promote your active listings</div>
+        </div>
+        <div class="tool-card" onclick="switchPanel(null,'panel-coins')">
+          <span class="tool-icon">🪙</span>
+          <div class="tool-title">DV Coins</div>
+          <div class="tool-desc">Buy coins and boost listing visibility</div>
+        </div>
+        <div class="tool-card" onclick="switchPanel(null,'panel-level')">
+          <span class="tool-icon">⬆️</span>
+          <div class="tool-title">My Level</div>
+          <div class="tool-desc">Track your seller level and unlock perks</div>
+        </div>
+      </div>
+
+      <div class="activity-box">
+        <div class="activity-box-title">Recent Activity</div>
+        <div class="act-item"><div class="act-dot"></div><strong>ShadowStrike_X99</strong> — 14 views today</div>
+        <div class="act-item"><div class="act-dot" style="background:#22c55e;"></div>New message on <strong>StormBringer_7</strong></div>
+        <div class="act-item"><div class="act-dot" style="background:#f59e0b;"></div>Earned 5 DV Coins from sale</div>
+      </div>
+    </div>
+
+    <!-- ══ PROFILE ══ -->
+    <div class="acct-panel" id="panel-profile">
+      <div class="panel-hdr">
+        <h1>Profile</h1>
+        <p>Edit your public profile information</p>
+      </div>
+      <div class="profile-form">
+        <div class="av-edit">
+          <div class="av-big">👤</div>
+          <div>
+            <button class="av-btn">Change Photo</button>
+            <div style="font-size:.69rem;color:var(--text-muted);margin-top:6px;">JPG, PNG · Max 2MB</div>
+          </div>
+        </div>
+        <div class="pf-row">
+          <div>
+            <label class="pf-lbl">Display Name</label>
+            <input class="pf-inp" type="text" id="profileName" placeholder="Your name"/>
+          </div>
+          <div>
+            <label class="pf-lbl">City</label>
+            <select class="pf-inp" id="profileCity" style="appearance:none;">
+              <option value="erbil">Erbil</option>
+              <option value="sulaymaniyah">Sulaymaniyah</option>
+              <option value="duhok">Duhok</option>
+              <option value="halabja">Halabja</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-bottom:14px;">
+          <label class="pf-lbl">Bio</label>
+          <textarea class="pf-inp" id="profileBio" rows="4" placeholder="Tell buyers about yourself…" style="resize:vertical;"></textarea>
+        </div>
+        <div style="margin-bottom:20px;">
+          <label class="pf-lbl">Telegram / Discord</label>
+          <input class="pf-inp" type="text" id="profileContact" placeholder="@username"/>
+        </div>
+        <button onclick="saveProfile()" class="btn btn-primary">💾 Save Profile</button>
+      </div>
+    </div>
+
+    <!-- ══ POST LISTING ══ -->
+    <div class="acct-panel" id="panel-post">
+      <div class="panel-hdr">
+        <h1>Post a Listing</h1>
+        <p>Choose what you want to sell on DIGIVAULT</p>
+      </div>
+      <div class="post-panel-grid">
+        <div class="post-big-card" onclick="window.location.href='post-game.html'">
+          <div class="pbc-icon">🎮</div>
+          <div class="pbc-title">Game Account</div>
+          <div class="pbc-desc">List your PUBG, EA Football, Clash Royale, or Fortnite account.</div>
+          <div class="pbc-tags"><span>PUBG</span><span>EA Football</span><span>Clash Royale</span><span>Fortnite</span></div>
+          <div class="pbc-arrow">→</div>
+        </div>
+        <div class="post-big-card" onclick="window.location.href='post-website.html'">
+          <div class="pbc-icon">🌐</div>
+          <div class="pbc-title">Website Template</div>
+          <div class="pbc-desc">Sell your HTML, WordPress, or React template with demo and specs.</div>
+          <div class="pbc-tags"><span>HTML/CSS</span><span>React</span><span>WordPress</span><span>Next.js</span></div>
+          <div class="pbc-arrow">→</div>
+        </div>
+        <div class="post-big-card" onclick="window.location.href='post-canva.html'">
+          <div class="pbc-icon">🎨</div>
+          <div class="pbc-title">Canva Template</div>
+          <div class="pbc-desc">Share your social media pack, pitch deck, or brand kit.</div>
+          <div class="pbc-tags"><span>Social Media</span><span>Pitch Deck</span><span>Brand Kit</span></div>
+          <div class="pbc-arrow">→</div>
+        </div>
+      </div>
+      <div class="post-panel-note">
+        <span>🪙</span>
+        <span>Listings are <strong>free to post</strong>. Use DV Coins to promote to the top of search results.</span>
+      </div>
+    </div>
+
+    <!-- ══ MY LISTINGS ══ -->
+    <div class="acct-panel" id="panel-listings">
+      <div class="panel-hdr">
+        <h1>My Listings</h1>
+        <p>Manage all your active and pending listings</p>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <span style="font-size:.81rem;color:var(--text-muted);" id="listingsTotalLabel">Loading…</span>
+        <button onclick="switchPanel(null,'panel-post')" class="btn btn-primary" style="font-size:.83rem;padding:9px 17px;">➕ Add New</button>
+      </div>
+      <div id="myListingsList">
+        <div style="padding:32px 0;text-align:center;color:var(--text-muted);font-size:.88rem;">Loading your listings…</div>
+      </div>
+    </div>
+
+    <!-- ══ DV COINS ══ -->
+    <div class="acct-panel" id="panel-coins">
+      <div class="panel-hdr">
+        <h1>DV Coins</h1>
+        <p>Promote your listings and unlock features</p>
+      </div>
+      <div class="coins-bal">
+        <div style="font-size:2.8rem;">🪙</div>
+        <div>
+          <div class="bal-num" id="coinsBalance">–</div>
+          <div class="bal-lbl">DV Coins Available</div>
+        </div>
+        <button onclick="openCoinsModal()" class="btn btn-primary" style="margin-left:auto;">Buy More</button>
+      </div>
+      <div class="section-heading">Packages</div>
+      <div class="pkg-grid">
+        <div class="coin-pkg" onclick="selectPkgCard(this)"><div class="pkg-amount">10</div><div class="pkg-label">🪙 DV Coins</div><div class="pkg-price">5,000 IQD</div></div>
+        <div class="coin-pkg selected" onclick="selectPkgCard(this)"><div class="pkg-amount">50</div><div class="pkg-label">🪙 DV Coins</div><div class="pkg-price">20,000 IQD</div><div class="pkg-badge">Best Value</div></div>
+        <div class="coin-pkg" onclick="selectPkgCard(this)"><div class="pkg-amount">150</div><div class="pkg-label">🪙 DV Coins</div><div class="pkg-price">50,000 IQD</div></div>
+      </div>
+      <div class="section-heading">Spend Coins</div>
+      <div class="coin-uses">
+        <div class="coin-use-item"><div><div class="cul">🔥 Promote for 24h</div><div class="cud">Feature at top of search results</div></div><button class="cu-btn" onclick="showToast('🔥 Promoted!','Listing featured for 24h.')">5 🪙</button></div>
+        <div class="coin-use-item"><div><div class="cul">🚀 Promote for 7 days</div><div class="cud">Priority placement all week</div></div><button class="cu-btn" onclick="showToast('🚀 7-day Boost!','Priority active.')">25 🪙</button></div>
+        <div class="coin-use-item"><div><div class="cul">⚡ Boost Level Points</div><div class="cud">Equivalent to 2 sales of progress</div></div><button class="cu-btn" onclick="showToast('⚡ Level Boosted!','Progress gained.')">15 🪙</button></div>
+      </div>
+    </div>
+
+    <!-- ══ MY LEVEL ══ -->
+    <div class="acct-panel" id="panel-level">
+      <div class="panel-hdr">
+        <h1>My Level</h1>
+        <p>Track your seller level and unlock perks</p>
+      </div>
+      <div class="lp-wrap">
+        <div class="lp-labels"><span>🥇 Gold Level 3</span><span>12 / 20 sales to Platinum</span></div>
+        <div class="lp-bar"><div class="lp-fill" style="width:60%"></div></div>
+      </div>
+      <div class="lvl-timeline">
+        <div class="lvl-tier"><div class="ti-icon ti-bronze">🥉</div><div><div class="tier-name">Bronze Seller</div><div class="tier-req">0 sales — Basic listing</div></div></div>
+        <div class="lvl-tier"><div class="ti-icon ti-silver">🥈</div><div><div class="tier-name">Silver Seller</div><div class="tier-req">5 sales — Badge + 2× search boost</div></div></div>
+        <div class="lvl-tier current"><div class="ti-icon ti-gold">🥇</div><div><div class="tier-name">Gold Seller</div><div class="tier-req">10 sales — Priority placement + Gold badge</div></div><span class="current-tag">Current</span></div>
+        <div class="lvl-tier"><div class="ti-icon ti-plat">💎</div><div><div class="tier-name">Platinum Seller</div><div class="tier-req">20 sales — Homepage featured + 5 DV/month</div></div></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ══ MOBILE BOTTOM ACTION BAR (phones only) ══
+     Always visible on mobile — replaces the hidden sidebar.
+     Shows: Dashboard · Edit Profile · Post Listing · My Listings · Logout
+═══════════════════════════════════════════════════════ -->
+<nav class="mobile-actions" id="mobileActions">
+  <button class="mob-btn" onclick="switchPanel(document.getElementById('nav-dashboard'),'panel-dashboard')">
+    <span class="mob-icon">📊</span>
+    <span class="mob-lbl">Dashboard</span>
+  </button>
+  <button class="mob-btn" onclick="switchPanel(null,'panel-profile')">
+    <span class="mob-icon">✏️</span>
+    <span class="mob-lbl">Edit Profile</span>
+  </button>
+  <button class="mob-btn mob-post" onclick="switchPanel(null,'panel-post')">
+    <span class="mob-icon">➕</span>
+    <span class="mob-lbl">Post</span>
+  </button>
+  <button class="mob-btn" onclick="switchPanel(null,'panel-listings')">
+    <span class="mob-icon">📋</span>
+    <span class="mob-lbl">Listings</span>
+  </button>
+  <button class="mob-btn mob-logout" onclick="doLogout()">
+    <span class="mob-icon">🚪</span>
+    <span class="mob-lbl">Logout</span>
+  </button>
+</nav>
+
+<script src="api.js"></script>
+<script src="i18n.js"></script>
+<script src="script.js"></script>
+<script src="global.js"></script>
+<script src="dashboard.js"></script>
+<script>
+  'use strict';
+
+  /* ── Toast fallback (before script.js loads) ── */
+  if (typeof showToast === 'undefined') {
+    window.showToast = function(t, m) {
+      var el = document.createElement('div');
+      el.style.cssText = 'position:fixed;bottom:26px;right:22px;background:linear-gradient(135deg,#0e1f38,#152840);border:1px solid rgba(14,165,233,.4);border-radius:12px;padding:13px 18px;color:#e0f2fe;font-size:.83rem;z-index:99999;box-shadow:0 8px 28px rgba(0,0,0,.5);max-width:290px;font-family:DM Sans,sans-serif;';
+      el.innerHTML = '<strong style="color:#38bdf8;display:block;margin-bottom:3px;">' + t + '</strong>' + m;
+      document.body.appendChild(el);
+      setTimeout(function(){ el.remove(); }, 3400);
+    };
+  }
+
+  /* ── Auth guard ── */
+  var userData = (typeof TW !== 'undefined') ? TW.getUser() : null;
+  if (!userData) {
+    window.location.replace('login.html');
+  } else {
+    document.body.style.visibility = 'visible';
+    var _coins = userData.coins || 0;
+    document.getElementById('sidebarName').textContent  = userData.name || 'User';
+    document.getElementById('dashGreeting').textContent = 'Welcome back, ' + (userData.name || 'User') + '!';
+    document.getElementById('sidebarCoins').textContent = _coins;
+    document.getElementById('dashCoins').textContent    = _coins;
+    document.getElementById('coinsBalance').textContent = _coins;
+    var _pName = document.getElementById('profileName');
+    if (_pName) _pName.value = userData.name || '';
+    var _pCity = document.getElementById('profileCity');
+    if (_pCity && userData.city) _pCity.value = userData.city;
+    var _pBio  = document.getElementById('profileBio');
+    if (_pBio  && userData.bio)  _pBio.value  = userData.bio;
+  }
+
+  /* ── Panel switcher ── */
+  function switchPanel(navEl, panelId) {
+    document.querySelectorAll('.sb-item').forEach(function(n){ n.classList.remove('active'); });
+    document.querySelectorAll('.acct-panel').forEach(function(p){ p.classList.remove('active'); });
+    if (navEl && navEl.classList && navEl.classList.contains('sb-item')) navEl.classList.add('active');
+    var panel = document.getElementById(panelId);
+    if (panel) panel.classList.add('active');
+    var main = document.getElementById('acctMain');
+    if (main) main.scrollTop = 0;
+    window.scrollTo(0,0);
+    closeSidebar();
+    /* Load listings when panel is opened */
+    if (panelId === 'panel-listings') loadMyListings();
+  }
+
+  /* ── Mobile sidebar ── */
+  function toggleSidebar(){
+    var sb=document.getElementById('acctSidebar'),bd=document.getElementById('sbBackdrop'),fab=document.getElementById('sidebarFab');
+    var open=sb.classList.toggle('open'); bd.classList.toggle('open',open); fab.textContent=open?'✕':'☰';
+  }
+  function closeSidebar(){
+    document.getElementById('acctSidebar').classList.remove('open');
+    document.getElementById('sbBackdrop').classList.remove('open');
+    document.getElementById('sidebarFab').textContent='☰';
+  }
+
+  /* ── Profile save ── */
+  function saveProfile(){
+    var name=document.getElementById('profileName').value.trim();
+    if(!name){ showToast('⚠️ Name required','Please enter a display name.'); return; }
+    TW.updateUser({ name:name, city:document.getElementById('profileCity').value, bio:document.getElementById('profileBio').value });
+    document.getElementById('sidebarName').textContent=name;
+    showToast('✅ Saved!','Profile updated.');
+  }
+
+  /* ── Coins modal ── */
+  function openCoinsModal()  { document.getElementById('coinsModal').classList.add('open');    document.body.style.overflow='hidden'; }
+  function closeCoinsModal() { document.getElementById('coinsModal').classList.remove('open'); document.body.style.overflow=''; }
+  function selectPkgCard(el) { document.querySelectorAll('.coin-pkg').forEach(function(p){p.classList.remove('selected');}); el.classList.add('selected'); }
+  function selectModalPkg(el){ el.parentElement.querySelectorAll('[onclick]').forEach(function(d){ d.style.borderColor='rgba(255,255,255,.08)'; }); el.style.borderColor='var(--amber)'; }
+  function buyCoinsPkg(){ showToast('🪙 Coins Added!','DV Coins added to your balance.'); closeCoinsModal(); }
+
+  /* ── esc helper ── */
+  function _esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+  /* ═══════════════════════════════════════════════
+     MY LISTINGS — dynamic loader
+  ═══════════════════════════════════════════════ */
+  async function loadMyListings() {
+    /* ── 1. Resolve user safely ── */
+    var user = null;
+    if (typeof TW !== 'undefined' && TW.getUser) {
+      user = TW.getUser();
+    }
+    // Fallback: read directly from localStorage (works even if global.js fails to load)
+    if (!user || !user.id) {
+      try { user = JSON.parse(localStorage.getItem('tw_user')); } catch(e) {}
+    }
+
+    /* ── 2. Validate — do NOT call API without a real userId ── */
+    if (!user || !user.id) {
+      console.warn('[DV] No logged-in user found — skipping loadMyListings');
+      var c = document.getElementById('myListingsList');
+      if (c) c.innerHTML = '<div style="padding:24px 0;text-align:center;color:var(--text-muted);font-size:.85rem;">No user logged in.</div>';
+      return;
+    }
+
+    console.log('[DV] loadMyListings user:', user);
+    console.log('User ID:', user.id);   // debug — confirm ID is present and correct
+
+    var container = document.getElementById('myListingsList');
+    var label     = document.getElementById('listingsTotalLabel');
+    if (!container) return;
+
+    container.innerHTML = '<div style="padding:24px 0;text-align:center;color:var(--text-muted);font-size:.85rem;">Loading…</div>';
+
+    try {
+      /* ── 3. Call backend directly with native fetch — no DVAPI dependency ── */
+      var response = await fetch('http://localhost:5001/api/products/' + user.id);
+      var data     = await response.json();
+      console.log('Listings response:', data);   // debug
+
+      /* ── 4. Backend returns a plain array — no wrapper to unwrap ── */
+      var products = Array.isArray(data) ? data : [];
+
+      if (label) label.textContent = products.length + ' listing' + (products.length !== 1 ? 's' : '') + ' total';
+
+      /* Update Active Listings stat card */
+      var activeCount = products.filter(function(p){ return p.status === 'active'; }).length;
+      var statCards = document.querySelectorAll('.stats-row .stat-card');
+      if (statCards[0]) statCards[0].querySelector('.sc-num').textContent = activeCount;
+
+      if (!products.length) {
+        container.innerHTML =
+          '<div style="padding:32px 0;text-align:center;color:var(--text-muted);font-size:.87rem;">' +
+          'No listings yet. <a href="post-game.html" style="color:var(--amber);font-weight:700;">Post your first listing →</a></div>';
+        return;
+      }
+
+      container.innerHTML = '';
+      products.forEach(function(p) {
+        var statusClass = p.status === 'active' ? 'active' : 'pending';
+        var statusLabel = p.status === 'active' ? 'Active' : (p.status === 'pending' ? 'Under Review' : _esc(p.status));
+        var catLabel    = _esc((p.category || '').replace(/_/g,' '));
+
+        var thumbHTML = (p.images && p.images.length && p.images[0].url)
+          ? '<img src="' + _esc(p.images[0].url) + '" alt="' + _esc(p.title) + '" style="width:44px;height:44px;object-fit:cover;border-radius:10px;">'
+          : '<span style="font-size:1.25rem;">🖼️</span>';
+
+        var item = document.createElement('div');
+        item.className = 'listing-item';
+        item.innerHTML =
+          '<div class="l-icon" style="overflow:hidden;padding:0;">' + thumbHTML + '</div>' +
+          '<div style="flex:1;min-width:0;">' +
+            '<div class="l-name">' + _esc(p.title) + '</div>' +
+            '<div class="l-meta">' + catLabel + (p.tags && p.tags.length ? ' · ' + _esc(p.tags[0]) : '') + '</div>' +
+          '</div>' +
+          '<span class="l-status ' + statusClass + '">' + statusLabel + '</span>' +
+          '<div class="l-price">' + Number(p.price).toLocaleString() + ' IQD</div>' +
+          '<div class="l-acts">' +
+            '<button class="promote dv-promote-btn">🔥 Promote</button>' +
+            '<button class="dv-view-btn">View</button>' +
+            '<button class="dv-delete-btn" style="color:rgba(239,68,68,.7);">Delete</button>' +
+          '</div>';
+
+        item.querySelector('.dv-promote-btn').addEventListener('click', function(){ promoteMyListing(p.id); });
+        item.querySelector('.dv-view-btn').addEventListener('click', function(){ window.location.href='view.html?id='+p.id; });
+        item.querySelector('.dv-delete-btn').addEventListener('click', function(){ deleteMyListing(p.id, item); });
+
+        container.appendChild(item);
+      });
+
+    } catch(err) {
+      console.error('[DV] loadMyListings:', err);
+      container.innerHTML = '<div style="padding:24px 0;text-align:center;color:#f87171;font-size:.85rem;">Could not load listings. Please try again.</div>';
+    }
+  }
+
+  async function deleteMyListing(id, itemEl) {
+    if (!confirm('Delete this listing? This cannot be undone.')) return;
+    try {
+      await fetch('http://localhost:5001/api/products/' + id, { method: 'DELETE' });
+      showToast('🗑 Deleted','Listing removed.');
+      if (itemEl) itemEl.remove();
+      loadMyListings(); /* refresh count */
+    } catch(err) {
+      console.error('[DV] deleteMyListing:', err);
+      showToast('❌ Error', err.message);
+    }
+  }
+
+  async function promoteMyListing(id) {
+    try {
+      var res = await fetch('http://localhost:5001/api/products/' + id + '/promote', { method: 'POST' });
+      var data = await res.json();
+      showToast('🔥 Promoted!','Listing featured for 24h! Coins remaining: ' + (data.coinsRemaining || ''));
+      if (typeof TW !== 'undefined') TW.updateCoins(-5);
+    } catch(err) {
+      showToast('❌ Error', err.message);
+    }
+  }
+
+  /* ── Theme ── */
+  (function(){ if(localStorage.getItem('tw_theme')==='light') document.body.classList.add('light-mode'); })();
+  function toggleTheme(){ var l=document.body.classList.toggle('light-mode'); localStorage.setItem('tw_theme',l?'light':'dark'); }
+
+  /* ── Sync from backend + load listings on page ready ── */
+  document.addEventListener('DOMContentLoaded', async function() {
+    var hasToken = (typeof DVAPI !== 'undefined') && DVAPI.Auth.isLoggedIn();
+    var localUser = null;
+    try { localUser = JSON.parse(localStorage.getItem('tw_user')); } catch(e) {}
+
+    if (hasToken) {
+      try {
+        var res = await DVAPI.Auth.getMe();
+        if (res && res.user && typeof TW !== 'undefined') {
+          TW.setUser({
+            name:   res.user.username,
+            email:  res.user.email,
+            city:   res.user.city  || '',
+            coins:  res.user.coins || 0,
+            level:  res.user.level || 'Bronze',
+            id:     res.user.id,
+            avatar: res.user.avatar || '👤',
+          });
+          var c = res.user.coins || 0;
+          document.getElementById('sidebarCoins').textContent = c;
+          document.getElementById('dashCoins').textContent    = c;
+          document.getElementById('coinsBalance').textContent = c;
+        }
+      } catch(err) {
+        console.error('[DV] getMe:', err);
+        if (err.status === 401 && typeof DVAPI !== 'undefined') { DVAPI.Auth.logout(); return; }
+      }
+    }
+    /* Load listings if we have any user session (token OR localStorage) */
+    if (hasToken || localUser) {
+      loadMyListings();
+    }
+  });
+</script>
+<script src="global.js"></script>
+<script src="api.js"></script>
+</body>
+</html>

@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <!-- ⚑ BLOCKING REDIRECT — runs before any CSS or HTML renders -->
+  <script>
+    (function() {
+      // If already logged in, skip login page entirely
+      if (localStorage.getItem('tw_user')) {
+        window.location.replace('account.html');
+      }
+    })();
+  </script>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Login — DIGIVAULT</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='16' fill='%230ea5e9'/><text x='50%25' y='62%25' text-anchor='middle' font-size='52' font-weight='900' fill='%2303080f' font-family='Arial'>DV</text></svg>"/>
+  <style>
+    .auth-page{min-height:100vh;display:flex;align-items:stretch;}
+
+    /* ── LEFT ILLUSTRATION PANEL ── */
+    .auth-left{
+      flex:1;
+      background:linear-gradient(145deg,#03080f 0%,#060d1c 40%,#091422 100%);
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      padding:60px 50px;position:relative;overflow:hidden;
+    }
+    .auth-left::before{
+      content:'';position:absolute;top:10%;left:10%;
+      width:500px;height:500px;border-radius:50%;
+      background:radial-gradient(circle,rgba(14,165,233,.1),transparent 65%);
+      pointer-events:none;
+    }
+    .auth-left::after{
+      content:'';position:absolute;bottom:5%;right:5%;
+      width:350px;height:350px;border-radius:50%;
+      background:radial-gradient(circle,rgba(2,132,199,.08),transparent 65%);
+      pointer-events:none;
+    }
+
+    /* Illustration SVG canvas */
+    .illus-scene{
+      width:100%;max-width:380px;position:relative;z-index:2;
+      margin-bottom:36px;
+    }
+    @keyframes floatCard{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+    .ic-icon{width:44px;height:44px;border-radius:12px;background:rgba(14,165,233,.15);border:1px solid rgba(14,165,233,.25);display:flex;align-items:center;justify-content:center;font-size:1.25rem;flex-shrink:0;}
+    .ic-title{font-family:'Bebas Neue',sans-serif;font-size:.95rem;letter-spacing:.05em;color:var(--cream);margin-bottom:2px;}
+    .ic-sub{font-size:.72rem;color:var(--text-muted);}
+    .ic-price{font-family:'Bebas Neue',sans-serif;font-size:1rem;color:#f59e0b;margin-left:auto;white-space:nowrap;}
+
+    /* Floating badges */
+    .illus-badges{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px;position:relative;z-index:2;}
+    .illus-badge{
+      background:rgba(14,165,233,.1);border:1px solid rgba(14,165,233,.22);
+      border-radius:100px;padding:6px 14px;
+      font-size:.75rem;font-weight:600;color:rgba(14,165,233,.9);
+      animation:fadeSlide .6s ease both;
+    }
+    .illus-badge:nth-child(2){animation-delay:.15s;}
+    .illus-badge:nth-child(3){animation-delay:.3s;}
+    .illus-badge:nth-child(4){animation-delay:.45s;}
+    @keyframes fadeSlide{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+    .illus-caption{text-align:center;position:relative;z-index:2;margin-top:28px;}
+    .illus-caption h2{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:.05em;color:var(--cream);margin-bottom:8px;}
+    .illus-caption p{font-size:.84rem;color:var(--text-muted);line-height:1.6;max-width:320px;}
+
+    /* ── RIGHT AUTH PANEL ── */
+    .auth-right{
+      width:460px;flex-shrink:0;
+      background:linear-gradient(180deg,rgba(6,13,28,.98),rgba(9,20,34,.99));
+      border-left:1px solid rgba(14,165,233,.1);
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      padding:60px 44px;position:relative;
+    }
+    .auth-right::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(to right,#0ea5e9,#38bdf8,transparent);}
+
+    .auth-logo{display:flex;align-items:center;gap:10px;margin-bottom:34px;}
+    .auth-logo .logo-icon{width:36px;height:36px;background:var(--amber);border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:.88rem;font-weight:900;color:var(--brown-950);}
+    .auth-logo-text{font-family:'Bebas Neue',sans-serif;font-size:1.65rem;letter-spacing:.08em;color:var(--cream);}
+    .auth-logo-text span{color:var(--amber);}
+
+    .auth-heading{text-align:center;margin-bottom:28px;}
+    .auth-heading h1{font-family:'Bebas Neue',sans-serif;font-size:1.55rem;letter-spacing:.05em;color:var(--cream);margin-bottom:6px;}
+    .auth-heading p{font-size:.82rem;color:var(--text-muted);}
+
+    /* Social login buttons — main CTA */
+    .social-btns{display:flex;flex-direction:column;gap:11px;width:100%;}
+    .soc-btn{
+      display:flex;align-items:center;justify-content:center;gap:12px;
+      width:100%;padding:14px 20px;border-radius:12px;
+      font-size:.9rem;font-weight:600;cursor:pointer;
+      transition:var(--transition);border:1.5px solid rgba(255,255,255,.1);
+      background:rgba(255,255,255,.05);color:var(--cream);
+    }
+    .soc-btn:hover{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.2);transform:translateY(-1px);}
+    .soc-btn.email-btn{
+      background:linear-gradient(135deg,#0ea5e9,#0284c7);
+      border-color:transparent;color:#fff;
+      box-shadow:0 4px 18px rgba(14,165,233,.35);
+    }
+    .soc-btn.email-btn:hover{background:linear-gradient(135deg,#38bdf8,#0ea5e9);box-shadow:0 6px 22px rgba(14,165,233,.45);}
+    .soc-icon{font-size:1.1rem;}
+
+    /* Divider */
+    .auth-or{display:flex;align-items:center;gap:12px;width:100%;margin:18px 0;}
+    .auth-or::before,.auth-or::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.08);}
+    .auth-or span{font-size:.76rem;color:var(--text-muted);white-space:nowrap;}
+
+    /* Email form (revealed on click) */
+    .email-form-wrap{
+      width:100%;max-height:0;overflow:hidden;
+      transition:max-height .4s cubic-bezier(.4,0,.2,1),opacity .3s ease;
+      opacity:0;
+    }
+    .email-form-wrap.open{max-height:460px;opacity:1;}
+    .ef-group{margin-bottom:13px;}
+    .ef-lbl{font-size:.69rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);display:block;margin-bottom:6px;}
+    .ef-inp{
+      width:100%;background:rgba(255,255,255,.05);
+      border:1.5px solid rgba(255,255,255,.1);border-radius:10px;
+      padding:12px 14px;font-size:.9rem;color:var(--cream);
+      outline:none;font-family:'DM Sans',sans-serif;transition:var(--transition);
+    }
+    .ef-inp:focus{border-color:var(--amber);background:rgba(14,165,233,.05);}
+    .ef-inp::placeholder{color:rgba(255,255,255,.25);}
+
+    /* Tabs */
+    .auth-tabs{display:flex;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:3px;gap:3px;width:100%;margin-bottom:18px;}
+    .auth-tab{flex:1;padding:9px;text-align:center;border-radius:7px;cursor:pointer;font-size:.85rem;font-weight:600;color:var(--text-muted);transition:var(--transition);}
+    .auth-tab.active{background:rgba(14,165,233,.18);color:#38bdf8;}
+    .auth-panel{display:none;width:100%;}
+    .auth-panel.active{display:block;}
+
+    .auth-submit-btn{
+      width:100%;padding:13px;border-radius:11px;border:none;
+      background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#fff;
+      font-size:.92rem;font-weight:700;cursor:pointer;
+      transition:var(--transition);box-shadow:0 4px 18px rgba(14,165,233,.3);
+      margin-top:4px;
+    }
+    .auth-submit-btn:hover{background:linear-gradient(135deg,#38bdf8,#0ea5e9);transform:translateY(-1px);}
+
+    .pw-strength{display:flex;gap:3px;margin-top:7px;}
+    .pw-bar{flex:1;height:3px;border-radius:3px;background:rgba(255,255,255,.08);transition:background .3s;}
+    .pw-bar.weak{background:#ef4444;}.pw-bar.medium{background:#f59e0b;}.pw-bar.strong{background:#22c55e;}
+
+    .auth-note{text-align:center;font-size:.75rem;color:var(--text-muted);margin-top:16px;line-height:1.6;}
+    .auth-note a{color:var(--amber);}
+
+    /* Light mode */
+    body.light-mode .auth-left{background:linear-gradient(145deg,#e2f0fb,#d0e8f8,#cde4f7)!important;}
+    body.light-mode
+    body.light-mode .ic-title{color:#0c1a2e!important;}
+    body.light-mode .ic-sub{color:#475569!important;}
+    body.light-mode .illus-caption h2{color:#0c1a2e!important;}
+    body.light-mode .illus-caption p{color:#475569!important;}
+    body.light-mode .illus-badge{background:rgba(255,255,255,.7)!important;border-color:rgba(14,165,233,.25)!important;}
+    body.light-mode .auth-right{background:linear-gradient(180deg,#f0f7ff,#e8f3fc)!important;border-left-color:rgba(2,132,199,.15)!important;}
+    body.light-mode .auth-heading h1{color:#0c1a2e!important;}
+    body.light-mode .auth-heading p{color:#475569!important;}
+    body.light-mode .auth-logo-text{color:#0c1a2e!important;}
+    body.light-mode .soc-btn{background:rgba(255,255,255,.88)!important;border-color:rgba(14,165,233,.2)!important;color:#0c1a2e!important;}
+    body.light-mode .soc-btn:hover{background:#fff!important;border-color:rgba(14,165,233,.4)!important;}
+    body.light-mode .soc-btn.email-btn{background:linear-gradient(135deg,#0ea5e9,#0284c7)!important;color:#fff!important;}
+    body.light-mode .ef-inp{background:#fff!important;border-color:rgba(14,165,233,.22)!important;color:#0c1a2e!important;}
+    body.light-mode .ef-inp::placeholder{color:#94a3b8!important;}
+    body.light-mode .ef-lbl{color:#475569!important;}
+    body.light-mode .auth-tabs{background:rgba(14,165,233,.06)!important;border-color:rgba(14,165,233,.15)!important;}
+    body.light-mode .auth-tab{color:#475569!important;}
+    body.light-mode .auth-tab.active{background:rgba(14,165,233,.14)!important;color:#0284c7!important;}
+    body.light-mode .auth-or span{color:#64748b!important;}
+    body.light-mode .auth-note{color:#475569!important;}
+    body.light-mode .auth-right::before{background:linear-gradient(to right,#0ea5e9,#38bdf8,transparent)!important;}
+
+    @media(max-width:860px){
+      .auth-page{flex-direction:column;min-height:unset;}
+      .auth-left{padding:44px 28px 28px;}
+      .auth-right{width:100%;border-left:none;border-top:1px solid rgba(14,165,233,.1);padding:40px 28px;}
+      .illus-scene{max-width:320px;}
+    }
+    @media(max-width:480px){
+      .auth-left{display:none;}
+      .auth-right{min-height:100vh;padding:80px 22px 40px;}
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar" role="navigation">
+  <a href="index.html" class="nav-logo">
+    <div class="logo-icon" style="font-family:'Bebas Neue',sans-serif;font-size:.78rem;font-weight:900;letter-spacing:.04em;">DV</div>
+    DIGI<span>VAULT</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="market.html">Accounts</a></li>
+  </ul>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <div id="lang-switcher"></div>
+    <button class="hamburger" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+<nav class="mobile-menu">
+  <a href="index.html">Home</a>
+  <a href="market.html">Accounts</a>
+</nav>
+
+<div class="auth-page">
+
+  <!-- LEFT: clean brand panel — NO account-style listing cards -->
+  <div class="auth-left">
+
+    <!-- Big logo -->
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:48px;position:relative;z-index:2;">
+      <div style="width:56px;height:56px;background:var(--amber);border-radius:14px;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:1.3rem;font-weight:900;color:#03080f;letter-spacing:.04em;box-shadow:0 8px 24px rgba(14,165,233,.35);">DV</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:1.9rem;letter-spacing:.08em;color:#e0f2fe;">DIGIV<span style="color:var(--amber);">AULT</span></div>
+    </div>
+
+    <!-- Headline -->
+    <div style="max-width:360px;text-align:center;position:relative;z-index:2;margin-bottom:44px;">
+      <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(2rem,3.5vw,2.8rem);letter-spacing:.04em;color:#ffffff;line-height:1.1;margin-bottom:14px;">
+        Buy & Sell Digital Assets<br><span style="color:var(--amber);">Safely & Easily</span>
+      </h1>
+      <p style="font-size:.9rem;color:rgba(255,255,255,.5);line-height:1.7;">
+        The trusted marketplace for game accounts,<br>website templates, and Canva designs.
+      </p>
+    </div>
+
+    <!-- 4 Feature highlights — NOT listing cards -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:360px;width:100%;position:relative;z-index:2;">
+      <div style="background:rgba(14,165,233,.1);border:1px solid rgba(14,165,233,.2);border-radius:14px;padding:18px 16px;">
+        <div style="font-size:1.6rem;margin-bottom:8px;">🛡️</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:.9rem;letter-spacing:.06em;color:#e0f2fe;margin-bottom:4px;">Verified Sellers</div>
+        <div style="font-size:.72rem;color:rgba(255,255,255,.45);line-height:1.5;">Every seller is reviewed before listing</div>
+      </div>
+      <div style="background:rgba(14,165,233,.1);border:1px solid rgba(14,165,233,.2);border-radius:14px;padding:18px 16px;">
+        <div style="font-size:1.6rem;margin-bottom:8px;">🪙</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:.9rem;letter-spacing:.06em;color:#e0f2fe;margin-bottom:4px;">DV Coin Rewards</div>
+        <div style="font-size:.72rem;color:rgba(255,255,255,.45);line-height:1.5;">Earn coins for every sale you make</div>
+      </div>
+      <div style="background:rgba(14,165,233,.1);border:1px solid rgba(14,165,233,.2);border-radius:14px;padding:18px 16px;">
+        <div style="font-size:1.6rem;margin-bottom:8px;">📍</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:.9rem;letter-spacing:.06em;color:#e0f2fe;margin-bottom:4px;">Kurdistan Market</div>
+        <div style="font-size:.72rem;color:rgba(255,255,255,.45);line-height:1.5;">Made for Erbil, Sulay, Duhok & more</div>
+      </div>
+      <div style="background:rgba(14,165,233,.1);border:1px solid rgba(14,165,233,.2);border-radius:14px;padding:18px 16px;">
+        <div style="font-size:1.6rem;margin-bottom:8px;">⬆️</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:.9rem;letter-spacing:.06em;color:#e0f2fe;margin-bottom:4px;">Seller Levels</div>
+        <div style="font-size:.72rem;color:rgba(255,255,255,.45);line-height:1.5;">Bronze → Gold → Platinum ranks</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT: auth -->
+  <div class="auth-right">
+    <div class="auth-logo">
+      <div class="logo-icon">DV</div>
+      <div class="auth-logo-text">DIGI<span>VAULT</span></div>
+    </div>
+
+    <div class="auth-heading">
+      <h1>Welcome Back</h1>
+      <p>Sign in to your account or create a new one</p>
+    </div>
+
+    <!-- Social login (primary) -->
+    <div class="social-btns">
+      <button class="soc-btn email-btn" onclick="showEmailForm()">
+        <span class="soc-icon">✉️</span> Continue with Email
+      </button>
+      <button class="soc-btn" onclick="socialLogin('Apple')">
+        <span class="soc-icon">🍎</span> Continue with Apple
+      </button>
+      <button class="soc-btn" onclick="socialLogin('Facebook')">
+        <span class="soc-icon">📘</span> Continue with Facebook
+      </button>
+    </div>
+
+    <!-- Email form (hidden until clicked) -->
+    <div class="email-form-wrap" id="emailFormWrap">
+      <div class="auth-or"><span>Enter your details</span></div>
+      <div class="auth-tabs">
+        <div class="auth-tab active" onclick="switchAuth(this,'panel-signin')">Sign In</div>
+        <div class="auth-tab" onclick="switchAuth(this,'panel-signup')">Create Account</div>
+      </div>
+
+      <!-- Sign In -->
+      <div class="auth-panel active" id="panel-signin">
+        <div class="ef-group">
+          <label class="ef-lbl">Email Address</label>
+          <input class="ef-inp" type="email" id="loginEmail" placeholder="you@email.com"/>
+        </div>
+        <div class="ef-group">
+          <label class="ef-lbl">Password</label>
+          <input class="ef-inp" type="password" id="loginPw" placeholder="Enter your password"/>
+        </div>
+        <div style="text-align:right;margin-bottom:14px;">
+          <a href="#" style="font-size:.76rem;color:var(--amber);">Forgot password?</a>
+        </div>
+        <button class="auth-submit-btn" onclick="doLogin()">Sign In →</button>
+      </div>
+
+      <!-- Create Account -->
+      <div class="auth-panel" id="panel-signup">
+        <div class="ef-group">
+          <label class="ef-lbl">Full Name</label>
+          <input class="ef-inp" type="text" id="regName" placeholder="Your display name"/>
+        </div>
+        <div class="ef-group">
+          <label class="ef-lbl">Email Address</label>
+          <input class="ef-inp" type="email" id="regEmail" placeholder="you@email.com"/>
+        </div>
+        <div class="ef-group">
+          <label class="ef-lbl">City</label>
+          <select class="ef-inp" id="regCity" style="appearance:none;">
+            <option value="" disabled selected>Select your city…</option>
+            <option value="erbil">Erbil (هەولێر)</option>
+            <option value="sulaymaniyah">Sulaymaniyah (سلێمانی)</option>
+            <option value="duhok">Duhok (دهۆک)</option>
+            <option value="halabja">Halabja (هەڵەبجە)</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="ef-group">
+          <label class="ef-lbl">Password</label>
+          <input class="ef-inp" type="password" id="regPw" placeholder="Create a password" oninput="checkPwStrength(this.value)"/>
+          <div class="pw-strength">
+            <div class="pw-bar" id="bar1"></div><div class="pw-bar" id="bar2"></div>
+            <div class="pw-bar" id="bar3"></div><div class="pw-bar" id="bar4"></div>
+          </div>
+        </div>
+        <button class="auth-submit-btn" onclick="doRegister()" style="margin-bottom:8px;">Create Account 🚀</button>
+      </div>
+    </div>
+
+    <div class="auth-note">
+      By continuing, you agree to our <a href="#">Terms</a> &amp; <a href="#">Privacy Policy</a>
+    </div>
+  </div>
+</div>
+
+<script src="i18n.js"></script>
+<script src="script.js"></script>
+  <script src="api.js"></script>
+  <script src="global.js"></script>
+<script>
+  if (localStorage.getItem('tw_user')) window.location.href = 'account.html';
+
+  function showEmailForm() {
+    var wrap = document.getElementById('emailFormWrap');
+    if (wrap.classList.toggle('open')) {
+      setTimeout(()=>{ var el=document.getElementById('loginEmail'); if(el) el.focus(); }, 350);
+    }
+  }
+
+  function switchAuth(tab, panelId) {
+    document.querySelectorAll('.auth-tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.auth-panel').forEach(p=>p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(panelId).classList.add('active');
+  }
+
+  async function doLogin() {
+    var email = document.getElementById('loginEmail').value.trim();
+    var pw    = document.getElementById('loginPw').value;
+    if (!email || !pw) { showFormError(['loginEmail','loginPw']); return; }
+
+    var btn = document.querySelector('#panel-signin .auth-submit-btn');
+    btn.disabled = true; btn.textContent = '⏳ Signing in…';
+
+    try {
+      var data = await DVAPI.Auth.login(email, pw);
+      // Sync into TW global so navbar coin pill works
+      if (window.TW) TW.setUser({ name: data.user.username, email: data.user.email, city: data.user.city || '', coins: data.user.coins, level: data.user.level, id: data.user.id });
+      showToast('✅ Welcome back!', 'Hello ' + data.user.username + '! Redirecting…');
+      setTimeout(function(){ window.location.href = 'account.html'; }, 1000);
+    } catch(err) {
+      showToast('❌ Login failed', err.message);
+      btn.disabled = false; btn.textContent = 'Sign In →';
+    }
+  }
+
+  async function doRegister() {
+    var name  = document.getElementById('regName').value.trim();
+    var email = document.getElementById('regEmail').value.trim();
+    var city  = document.getElementById('regCity').value;
+    var pw    = document.getElementById('regPw').value;
+    if (!name || !email || !city || !pw) { showToast('⚠️ Missing fields', 'Please fill all required fields.'); return; }
+    if (pw.length < 6) { showToast('⚠️ Weak password', 'Password must be at least 6 characters.'); return; }
+
+    var btn = document.querySelector('#panel-signup .auth-submit-btn');
+    btn.disabled = true; btn.textContent = '⏳ Creating account…';
+
+    try {
+      var data = await DVAPI.Auth.register(name, email, pw);
+      if (window.TW) TW.setUser({ name: data.user.username, email: data.user.email, city: city, coins: data.user.coins, level: data.user.level, id: data.user.id });
+      // Save city to profile
+      try { await DVAPI.Auth.updateProfile({ city: city }); } catch(_){}
+      showToast('🎉 Account Created!', 'Welcome! You got ' + data.user.coins + ' DV Coins!');
+      setTimeout(function(){ window.location.href = 'account.html'; }, 1200);
+    } catch(err) {
+      showToast('❌ Registration failed', err.message);
+      btn.disabled = false; btn.textContent = 'Create Account 🚀';
+    }
+  }
+
+  function socialLogin(provider) {
+    showToast('ℹ️ Coming soon', provider + ' login will be available soon. Please use email.');
+  }
+
+  function showFormError(ids) {
+    ids.forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el && !el.value) {
+        el.style.borderColor = '#ef4444';
+        el.addEventListener('input', function(){ el.style.borderColor = ''; }, { once: true });
+      }
+    });
+  }
+
+  function checkPwStrength(val) {
+    var bars = [1,2,3,4].map(function(i){ return document.getElementById('bar'+i); });
+    bars.forEach(function(b){ b.className = 'pw-bar'; });
+    if (val.length >= 4)  bars[0].classList.add('weak');
+    if (val.length >= 6)  bars[1].classList.add('medium');
+    if (val.length >= 8 && /[A-Z]/.test(val))  bars[2].classList.add('strong');
+    if (val.length >= 10 && /[0-9!@#$]/.test(val)) bars[3].classList.add('strong');
+  }
+
+  if (typeof showToast === 'undefined') {
+    window.showToast = function(t, m) {
+      var el = document.createElement('div');
+      el.style.cssText = 'position:fixed;bottom:26px;right:22px;background:linear-gradient(135deg,#0e1f38,#152840);border:1px solid rgba(14,165,233,.4);border-radius:12px;padding:13px 18px;color:#e0f2fe;font-size:.83rem;z-index:9999;box-shadow:0 8px 28px rgba(0,0,0,.5);max-width:290px;';
+      el.innerHTML = '<strong style="color:#38bdf8;display:block;margin-bottom:3px;">'+t+'</strong>'+m;
+      document.body.appendChild(el);
+      setTimeout(()=>el.remove(), 3400);
+    };
+  }
+</script>
+<script>
+  (function(){ if(localStorage.getItem('tw_theme')==='light') document.body.classList.add('light-mode'); })();
+  function toggleTheme(){ var l=document.body.classList.toggle('light-mode'); localStorage.setItem('tw_theme',l?'light':'dark'); }
+</script>
+</body>
+</html>

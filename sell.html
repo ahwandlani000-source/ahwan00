@@ -1,189 +1,69 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Sell your PUBG Mobile account on PUBGVault — fill in your account details and reach thousands of buyers." />
-  <title>Sell Your Account — PUBGVault</title>
+  <meta name="description" content="List your digital account on DIGIVAULT — fill in your account details and reach thousands of buyers." />
+  <title>List Account — DIGIVAULT</title>
   <link rel="stylesheet" href="style.css" />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='16' fill='%230ea5e9'/><text x='50%25' y='62%25' text-anchor='middle' font-size='52' font-weight='900' fill='%2303080f' font-family='Arial'>DV</text></svg>" />
   <style>
-    /* ---- Sell-page specific ---- */
     .sell-progress {
-      display: flex;
-      align-items: center;
-      gap: 0;
-      max-width: 500px;
-      margin: 32px auto 0;
-      justify-content: center;
+      display:flex; align-items:center; gap:0;
+      max-width:500px; margin:32px auto 0; justify-content:center;
     }
     .progress-step {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: var(--text-muted);
+      display:flex; align-items:center; gap:10px;
+      font-size:0.82rem; font-weight:600; color:var(--text-muted);
     }
-    .progress-step.active { color: var(--amber); }
-    .progress-step.done { color: var(--cream); }
+    .progress-step.active { color:var(--amber); }
+    .progress-step.done   { color:var(--cream); }
     .ps-num {
-      width: 30px; height: 30px;
-      border-radius: 50%;
-      border: 2px solid rgba(255,255,255,0.15);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.78rem;
-      transition: var(--transition);
+      width:30px; height:30px; border-radius:50%;
+      border:2px solid rgba(255,255,255,0.15);
+      display:flex; align-items:center; justify-content:center;
+      font-size:0.78rem; transition:var(--transition);
     }
-    .progress-step.active .ps-num {
-      border-color: var(--amber);
-      background: rgba(200,134,10,0.15);
-      color: var(--amber);
-    }
-    .progress-step.done .ps-num {
-      border-color: #2ecc71;
-      background: rgba(46,204,113,0.15);
-      color: #2ecc71;
-    }
-    .ps-connector {
-      flex: 1;
-      height: 2px;
-      background: rgba(255,255,255,0.08);
-      min-width: 30px;
-      max-width: 60px;
-      margin: 0 4px;
-    }
+    .progress-step.active .ps-num { border-color:var(--amber); background:rgba(14,165,233,0.15); color:var(--amber); }
+    .progress-step.done   .ps-num { border-color:#2ecc71; background:rgba(46,204,113,0.15); color:#2ecc71; }
+    .ps-connector { flex:1; height:2px; background:rgba(255,255,255,0.08); min-width:30px; max-width:60px; margin:0 4px; }
 
-    /* Tier select visual */
-    .tier-select-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-top: 6px;
-    }
-    .tier-option {
-      border: 1.5px solid rgba(255,255,255,0.1);
-      border-radius: var(--radius-sm);
-      padding: 12px 8px;
-      text-align: center;
-      cursor: pointer;
-      transition: var(--transition);
-      font-size: 0.8rem;
-      color: var(--text-muted);
-    }
-    .tier-option:hover {
-      border-color: rgba(200,134,10,0.4);
-      color: var(--cream);
-    }
-    .tier-option.selected {
-      border-color: var(--amber);
-      background: rgba(200,134,10,0.1);
-      color: var(--amber);
-    }
-    .tier-option .t-icon { font-size: 1.4rem; margin-bottom: 4px; display: block; }
+    .input-with-prefix { position:relative; }
+    .input-prefix { position:absolute; left:14px; top:50%; transform:translateY(-50%); font-weight:600; color:var(--amber); font-size:0.88rem; pointer-events:none; white-space:nowrap; }
+    .input-with-prefix input { padding-left:56px !important; }
 
-    /* Price input with currency prefix */
-    .input-with-prefix {
-      position: relative;
-    }
-    .input-prefix {
-      position: absolute;
-      left: 14px; top: 50%; transform: translateY(-50%);
-      font-weight: 600;
-      color: var(--amber);
-      font-size: 0.95rem;
-      pointer-events: none;
-    }
-    .input-with-prefix input { padding-left: 30px !important; }
+    .char-counter { text-align:right; font-size:0.72rem; color:var(--text-muted); margin-top:6px; }
 
-    /* Char counter */
-    .char-counter {
-      text-align: right;
-      font-size: 0.72rem;
-      color: var(--text-muted);
-      margin-top: 6px;
-    }
-
-    /* Tips sidebar panel */
     .sell-layout {
-      display: grid;
-      grid-template-columns: 1fr 300px;
-      gap: 32px;
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 0 5% 100px;
+      display:grid; grid-template-columns:1fr 300px; gap:32px;
+      max-width:1100px; margin:0 auto; padding:0 5% 100px;
     }
-    .tips-panel {
-      position: sticky;
-      top: 90px;
-      align-self: start;
-    }
-    .tips-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-bdr);
-      border-radius: var(--radius);
-      padding: 28px;
-    }
-    .tips-card h3 {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 1.1rem;
-      letter-spacing: 0.07em;
-      color: var(--amber);
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .tip-item {
-      display: flex;
-      gap: 10px;
-      font-size: 0.82rem;
-      color: var(--text-muted);
-      line-height: 1.55;
-      padding: 10px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-    }
-    .tip-item:last-child { border-bottom: none; }
-    .tip-item .tip-icon { flex-shrink: 0; }
+    .tips-panel { position:sticky; top:90px; align-self:start; }
+    .tips-card { background:var(--card-bg); border:1px solid var(--card-bdr); border-radius:var(--radius); padding:28px; }
+    .tips-card h3 { font-family:'Bebas Neue',sans-serif; font-size:1.1rem; letter-spacing:0.07em; color:var(--amber); margin-bottom:16px; display:flex; align-items:center; gap:8px; }
+    .tip-item { display:flex; gap:10px; font-size:0.82rem; color:var(--text-muted); line-height:1.55; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.05); }
+    .tip-item:last-child { border-bottom:none; }
+    .tip-item .tip-icon { flex-shrink:0; }
 
-    /* Preview card live update */
-    .preview-card {
-      background: linear-gradient(145deg, rgba(93,47,8,0.5), rgba(28,9,0,0.7));
-      border: 1px solid var(--card-bdr);
-      border-radius: var(--radius);
-      padding: 22px;
-      margin-top: 20px;
-    }
-    .preview-card h4 {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 0.9rem;
-      letter-spacing: 0.1em;
-      color: var(--text-muted);
-      margin-bottom: 14px;
-      text-transform: uppercase;
-    }
-    .preview-title {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 1.2rem;
-      letter-spacing: 0.06em;
-      color: var(--cream);
-      margin-bottom: 6px;
-      min-height: 28px;
-    }
-    .preview-price {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 1.6rem;
-      color: var(--amber);
-      letter-spacing: 0.04em;
-    }
+    .preview-card { background:linear-gradient(145deg,rgba(15,32,53,0.5),rgba(6,13,28,0.7)); border:1px solid var(--card-bdr); border-radius:var(--radius); padding:22px; margin-top:20px; }
+    .preview-card h4 { font-family:'Bebas Neue',sans-serif; font-size:0.9rem; letter-spacing:0.1em; color:var(--text-muted); margin-bottom:14px; }
+    .preview-title { font-family:'Bebas Neue',sans-serif; font-size:1.2rem; letter-spacing:0.06em; color:var(--cream); margin-bottom:6px; min-height:28px; }
+    .preview-price { font-family:'Bebas Neue',sans-serif; font-size:1.5rem; color:var(--amber); letter-spacing:0.04em; }
 
-    @media (max-width: 820px) {
-      .sell-layout { grid-template-columns: 1fr; }
-      .tips-panel { position: static; }
-      .tier-select-grid { grid-template-columns: repeat(2, 1fr); }
+    /* Register gate */
+    .register-gate {
+      background:rgba(14,165,233,0.07);border:1.5px solid rgba(14,165,233,0.3);border-radius:var(--radius);padding:28px;
+      text-align:center; margin-bottom:28px;
     }
-    @media (max-width: 480px) {
-      .tier-select-grid { grid-template-columns: repeat(3, 1fr); }
+    .register-gate h3 { font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:0.06em;color:var(--amber);margin-bottom:10px; }
+    .register-gate p { font-size:0.85rem;color:var(--text-muted);line-height:1.7;margin-bottom:16px; }
+    .reg-form { display:flex;gap:10px;flex-wrap:wrap;justify-content:center; }
+    .reg-form input { background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.1);border-radius:var(--radius-sm);padding:10px 14px;color:var(--cream);outline:none;font-size:0.88rem;min-width:200px;transition:var(--transition);font-family:'DM Sans',sans-serif; }
+    .reg-form input:focus { border-color:var(--amber); }
+
+    @media(max-width:820px){
+      .sell-layout{grid-template-columns:1fr;}
+      .tips-panel{position:static;}
     }
   </style>
 </head>
@@ -192,47 +72,49 @@
   <!-- NAVBAR -->
   <nav class="navbar" role="navigation">
     <a href="index.html" class="nav-logo">
-      <div class="logo-icon">🎮</div>
-      PUBG<span>Vault</span>
+      <div class="logo-icon" style="font-family:'Bebas Neue',sans-serif;font-size:0.78rem;font-weight:900;letter-spacing:0.04em;">DV</div>
+      DIGIV<span>AULT</span>
     </a>
     <ul class="nav-links">
-      <li><a href="index.html">Home</a></li>
-      <li><a href="market.html">Marketplace</a></li>
-      <li><a href="index.html#contact">Contact</a></li>
-      <li><a href="sell.html" class="active nav-cta">Sell Account</a></li>
+      <li><a href="index.html"                       data-i18n="nav.home">Home</a></li>
+      <li><a href="market.html"                      data-i18n="nav.accounts">Accounts</a></li>
+      <li><a href="index.html#contact"               data-i18n="nav.contact">Contact</a></li>
+      <li><a href="sell.html" class="active nav-cta" data-i18n="nav.account">Account</a></li>
     </ul>
-    <button class="hamburger" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div id="lang-switcher"></div>
+      <button class="hamburger" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+    </div>
   </nav>
   <nav class="mobile-menu">
-    <a href="index.html">Home</a>
-    <a href="market.html">Marketplace</a>
-    <a href="index.html#contact">Contact</a>
-    <a href="sell.html">Sell Account</a>
+    <a href="index.html"         data-i18n="nav.home">Home</a>
+    <a href="market.html"        data-i18n="nav.accounts">Accounts</a>
+    <a href="index.html#contact" data-i18n="nav.contact">Contact</a>
+    <a href="sell.html"          data-i18n="nav.account">Account</a>
   </nav>
 
   <!-- PAGE HERO -->
   <section class="page-hero">
-    <p class="section-tag" style="justify-content:center;">Seller Dashboard</p>
-    <h1 class="section-title" style="font-size:clamp(2.4rem,5vw,4rem);">List Your Account</h1>
-    <p class="section-sub" style="margin:16px auto 0;text-align:center;">
+    <p class="section-tag" style="justify-content:center;" data-i18n="sell.tag">Seller Dashboard</p>
+    <h1 class="section-title" style="font-size:clamp(2.4rem,5vw,4rem);" data-i18n="sell.title">List Your Account</h1>
+    <p class="section-sub" style="margin:16px auto 0;text-align:center;" data-i18n="sell.sub">
       Fill in your account details below. Listings go live after a quick verification (usually under 30 minutes).
     </p>
 
-    <!-- Progress indicator -->
     <div class="sell-progress" aria-label="Form progress">
       <div class="progress-step active">
         <div class="ps-num">1</div>
-        <span>Account Info</span>
+        <span data-i18n="sell.prog.info">Account Info</span>
       </div>
       <div class="ps-connector"></div>
       <div class="progress-step">
         <div class="ps-num">2</div>
-        <span>Media</span>
+        <span data-i18n="sell.prog.media">Media</span>
       </div>
       <div class="ps-connector"></div>
       <div class="progress-step">
         <div class="ps-num">3</div>
-        <span>Review</span>
+        <span data-i18n="sell.prog.review">Review</span>
       </div>
     </div>
   </section>
@@ -243,226 +125,199 @@
 
     <!-- ---- FORM ---- -->
     <div>
+
+      <!-- REGISTER GATE - only shown if not logged in -->
+      <div class="register-gate" id="registerGate" style="display:none;">
+        <h3>🔐 Sign In to Start Selling</h3>
+        <p>You need a DIGIVAULT account to list your digital assets and reach thousands of buyers.</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:8px;">
+          <a href="login.html" class="btn btn-primary" style="padding:10px 24px;font-size:0.9rem;">Sign In →</a>
+          <a href="login.html" class="btn btn-outline" style="padding:10px 24px;font-size:0.9rem;">Create Account</a>
+        </div>
+      </div>
+
       <form class="sell-form" id="sellForm" novalidate>
 
         <!-- Section 1: Account Details -->
-        <h2 class="form-section-title">📋 Account Details</h2>
+        <h2 class="form-section-title" data-i18n="sell.sec.details">📋 Account Details</h2>
 
-        <div class="form-row">
-          <div class="form-group">
-            <label for="accountName">Account Name <span style="color:#e74c3c">*</span></label>
-            <input
-              type="text"
-              id="accountName"
-              name="accountName"
-              placeholder="e.g. ShadowStrike_X99"
-              required
-              maxlength="32"
-            />
-          </div>
-          <div class="form-group">
-            <label for="accountLevel">Account Level <span style="color:#e74c3c">*</span></label>
-            <input
-              type="number"
-              id="accountLevel"
-              name="accountLevel"
-              placeholder="e.g. 80"
-              min="1" max="200"
-              required
-            />
-          </div>
-        </div>
-
-        <!-- Tier selector -->
+        <!-- Account ID (NEW - required) -->
         <div class="form-group">
-          <label>Current Rank / Tier <span style="color:#e74c3c">*</span></label>
-          <div class="tier-select-grid" id="tierGrid" role="group" aria-label="Select account tier">
-            <div class="tier-option" data-tier="conqueror" onclick="selectTier(this)" tabindex="0">
-              <span class="t-icon">👑</span>Conqueror
-            </div>
-            <div class="tier-option" data-tier="ace" onclick="selectTier(this)" tabindex="0">
-              <span class="t-icon">🏆</span>Ace
-            </div>
-            <div class="tier-option" data-tier="crown" onclick="selectTier(this)" tabindex="0">
-              <span class="t-icon">💫</span>Crown
-            </div>
-            <div class="tier-option" data-tier="diamond" onclick="selectTier(this)" tabindex="0">
-              <span class="t-icon">💎</span>Diamond
-            </div>
-            <div class="tier-option" data-tier="platinum" onclick="selectTier(this)" tabindex="0">
-              <span class="t-icon">🥈</span>Platinum
-            </div>
-            <div class="tier-option" data-tier="gold" onclick="selectTier(this)" tabindex="0">
-              <span class="t-icon">🥇</span>Gold
-            </div>
-          </div>
-          <!-- Hidden input to capture tier selection -->
-          <input type="hidden" id="accountTier" name="accountTier" />
+          <label for="accountId" data-i18n="sell.lbl.id">Account ID <span style="color:#e74c3c">*</span></label>
+          <input type="text" id="accountId" name="accountId"
+                 data-i18n-placeholder="sell.ph.id"
+                 placeholder="e.g. 51234567890"
+                 required maxlength="20" />
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label for="accountRegion">Account Region <span style="color:#e74c3c">*</span></label>
-            <select id="accountRegion" name="accountRegion" required>
-              <option value="" disabled selected>Select region…</option>
-              <option value="asia">Asia</option>
-              <option value="me">Middle East</option>
-              <option value="eu">Europe</option>
-              <option value="na">North America</option>
-              <option value="sa">South America</option>
-              <option value="sea">South-East Asia</option>
-            </select>
+            <label for="accountName" data-i18n="sell.lbl.name">Account Name <span style="color:#e74c3c">*</span></label>
+            <input type="text" id="accountName" name="accountName"
+                   data-i18n-placeholder="sell.ph.name"
+                   placeholder="e.g. ShadowStrike_X99"
+                   required maxlength="32" />
           </div>
           <div class="form-group">
-            <label for="accountAge">Account Age</label>
-            <select id="accountAge" name="accountAge">
-              <option value="" disabled selected>Select age…</option>
-              <option value="<1y">Less than 1 year</option>
-              <option value="1-2y">1–2 years</option>
-              <option value="2-3y">2–3 years</option>
-              <option value="3y+">3+ years</option>
+            <label for="accountLevel" data-i18n="sell.lbl.level">Account Level <span style="color:#e74c3c">*</span></label>
+            <input type="number" id="accountLevel" name="accountLevel"
+                   data-i18n-placeholder="sell.ph.level"
+                   placeholder="e.g. 80"
+                   min="1" max="200" required />
+          </div>
+        </div>
+
+        <!-- Collections (NEW - number) -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="accountCollections" data-i18n="sell.lbl.collections">Collections (number) <span style="color:#e74c3c">*</span></label>
+            <input type="number" id="accountCollections" name="collections"
+                   data-i18n-placeholder="sell.ph.collections"
+                   placeholder="e.g. 45"
+                   min="0" max="9999" required />
+          </div>
+          <div class="form-group">
+            <label for="accountCategory">Category <span style="color:#e74c3c">*</span></label>
+            <select id="accountCategory" name="category" required>
+              <option value="" disabled selected>Select category…</option>
+              <option value="pubg">🎮 PUBG</option>
+              <option value="ea">⚽ EA Football</option>
+              <option value="cr">⚔️ Clash Royale</option>
+              <option value="fortnite">🎯 Fortnite</option>
+              <option value="web">🌐 Website Template</option>
+              <option value="canva">🎨 Canva Template</option>
+              <option value="other">📦 Other Digital Asset</option>
             </select>
           </div>
         </div>
 
-        <!-- Section 2: Pricing -->
-        <h2 class="form-section-title">💰 Pricing</h2>
+        <!-- Section 2: Pricing (IQD) -->
+        <h2 class="form-section-title" data-i18n="sell.sec.pricing">💰 Pricing (IQD)</h2>
 
         <div class="form-row">
           <div class="form-group">
-            <label for="accountPrice">Asking Price (USD) <span style="color:#e74c3c">*</span></label>
+            <label for="accountPrice" data-i18n="sell.lbl.price">Asking Price (IQD) <span style="color:#e74c3c">*</span></label>
             <div class="input-with-prefix">
-              <span class="input-prefix">$</span>
-              <input
-                type="number"
-                id="accountPrice"
-                name="price"
-                placeholder="0.00"
-                min="1"
-                step="0.01"
-                required
-              />
+              <span class="input-prefix">IQD</span>
+              <input type="number" id="accountPrice" name="price"
+                     data-i18n-placeholder="sell.ph.price"
+                     placeholder="e.g. 450000" min="1000" step="1000" required />
             </div>
           </div>
           <div class="form-group">
-            <label for="negotiable">Negotiable?</label>
+            <label for="negotiable" data-i18n="sell.lbl.negotiable">Negotiable?</label>
             <select id="negotiable" name="negotiable">
-              <option value="yes">Yes, open to offers</option>
-              <option value="no">No, fixed price</option>
+              <option value="yes" data-i18n="sell.opt.neg.yes">Yes, open to offers</option>
+              <option value="no"  data-i18n="sell.opt.neg.no">No, fixed price</option>
             </select>
           </div>
+        </div>
+
+        <!-- DV Coin Promotion -->
+        <div style="background:rgba(14,165,233,0.07);border:1px solid rgba(14,165,233,0.25);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+          <span style="font-size:1.4rem;">🪙</span>
+          <div>
+            <div style="font-size:0.85rem;font-weight:600;color:var(--amber);">Promote this listing</div>
+            <div style="font-size:0.78rem;color:var(--text-muted);">Spend 5 DV Coins to feature your listing at the top for 24 hours</div>
+          </div>
+          <button type="button" style="margin-left:auto;background:rgba(14,165,233,0.15);border:1.5px solid rgba(14,165,233,0.4);color:var(--amber);border-radius:8px;padding:7px 14px;font-size:0.78rem;font-weight:700;cursor:pointer;">Add Promotion</button>
         </div>
 
         <!-- Section 3: Description -->
-        <h2 class="form-section-title">📝 Description</h2>
+        <h2 class="form-section-title" data-i18n="sell.sec.desc">📝 Description</h2>
 
         <div class="form-group">
-          <label for="accountDescription">Account Description <span style="color:#e74c3c">*</span></label>
-          <textarea
-            id="accountDescription"
-            name="description"
-            placeholder="Describe your account in detail — skins owned, UC balance, notable achievements, weapons, title collection, etc."
-            required
-            maxlength="1000"
-            rows="6"
-          ></textarea>
+          <label for="accountDescription" data-i18n="sell.lbl.descField">Account Description <span style="color:#e74c3c">*</span></label>
+          <textarea id="accountDescription" name="description"
+                    data-i18n-placeholder="sell.ph.desc"
+                    placeholder="Describe your account in detail — items owned, balance, notable achievements, etc."
+                    required maxlength="1000" rows="6"></textarea>
           <div class="char-counter"><span id="descCount">0</span> / 1000</div>
         </div>
 
         <div class="form-group">
-          <label for="accountHighlights">Key Highlights (comma-separated)</label>
-          <input
-            type="text"
-            id="accountHighlights"
-            name="highlights"
-            placeholder="e.g. M416 Glacier, 5000+ kills, Mythic outfits"
-          />
+          <label for="accountHighlights" data-i18n="sell.lbl.highlights">Key Highlights (comma-separated)</label>
+          <input type="text" id="accountHighlights" name="highlights"
+                 data-i18n-placeholder="sell.ph.highlights"
+                 placeholder="e.g. M416 Glacier, 5000+ kills, Mythic outfits" />
         </div>
 
         <!-- Section 4: Media -->
-        <h2 class="form-section-title">🖼️ Media</h2>
+        <h2 class="form-section-title" data-i18n="sell.sec.media">🖼️ Media</h2>
 
         <div class="form-group">
-          <label>Account Screenshots <span style="color:#e74c3c">*</span></label>
+          <label data-i18n="sell.lbl.images">Account Screenshots <span style="color:#e74c3c">*</span></label>
           <div class="file-upload-zone" id="imageUploadZone">
-            <input
-              type="file"
-              id="accountImages"
-              name="images"
-              accept="image/*"
-              multiple
-              required
-              aria-label="Upload account screenshots"
-            />
+            <input type="file" id="accountImages" name="images" accept="image/*" multiple required aria-label="Upload account screenshots" />
             <div class="upload-icon">🖼️</div>
             <p class="upload-text">
-              <strong>Click to upload</strong> or drag & drop<br />
-              PNG, JPG, WEBP — up to 10 images (max 5MB each)
+              <strong data-i18n="sell.upload.imgStrong">Click to upload</strong>
+              <span> or drag &amp; drop</span><br />
+              <span data-i18n="sell.upload.imgSub">PNG, JPG, WEBP — up to 10 images (max 5MB each)</span>
             </p>
           </div>
           <div class="file-previews" id="imagePreviews"></div>
         </div>
 
         <div class="form-group">
-          <label>Gameplay Video <span style="font-weight:400;color:var(--text-muted)">(Optional)</span></label>
+          <label>
+            <span data-i18n="sell.lbl.video">Account Video (max 2 min)</span>
+            <span style="font-weight:400;color:var(--text-muted)" data-i18n="sell.lbl.videoOpt">(Optional)</span>
+          </label>
           <div class="file-upload-zone">
-            <input
-              type="file"
-              id="accountVideo"
-              name="video"
-              accept="video/*"
-              aria-label="Upload gameplay video"
-            />
+            <input type="file" id="accountVideo" name="video" accept="video/*" aria-label="Upload account video" />
             <div class="upload-icon">🎥</div>
             <p class="upload-text">
-              <strong>Click to upload</strong> a gameplay video<br />
-              MP4, MOV, AVI — max 100MB
+              <strong data-i18n="sell.upload.vidStrong">Click to upload a video (max 2 minutes)</strong><br />
+              <span data-i18n="sell.upload.vidSub">MP4, MOV, AVI — max 100MB</span>
             </p>
           </div>
           <div class="file-previews" id="videoPreviews"></div>
         </div>
 
         <!-- Section 5: Seller Info -->
-        <h2 class="form-section-title">👤 Seller Contact</h2>
+        <h2 class="form-section-title" data-i18n="sell.sec.seller">👤 Seller Contact</h2>
 
         <div class="form-row">
           <div class="form-group">
-            <label for="sellerName">Your Name <span style="color:#e74c3c">*</span></label>
-            <input type="text" id="sellerName" name="sellerName" placeholder="Display name" required />
+            <label for="sellerName" data-i18n="sell.lbl.sellerName">Your Name <span style="color:#e74c3c">*</span></label>
+            <input type="text" id="sellerName" name="sellerName"
+                   data-i18n-placeholder="sell.ph.sellerName"
+                   placeholder="Display name" required />
           </div>
           <div class="form-group">
-            <label for="sellerEmail">Email Address <span style="color:#e74c3c">*</span></label>
-            <input type="email" id="sellerEmail" name="sellerEmail" placeholder="you@email.com" required />
+            <label for="sellerEmail" data-i18n="sell.lbl.sellerEmail">Email Address <span style="color:#e74c3c">*</span></label>
+            <input type="email" id="sellerEmail" name="sellerEmail"
+                   data-i18n-placeholder="sell.ph.sellerEmail"
+                   placeholder="you@email.com" required />
           </div>
         </div>
 
         <div class="form-group">
-          <label for="sellerTelegram">Telegram / Discord (optional)</label>
-          <input type="text" id="sellerTelegram" name="sellerContact" placeholder="@username or Username#1234" />
+          <label for="sellerTelegram" data-i18n="sell.lbl.telegram">Telegram / Discord (optional)</label>
+          <input type="text" id="sellerTelegram" name="sellerContact"
+                 data-i18n-placeholder="sell.ph.telegram"
+                 placeholder="@username or Username#1234" />
         </div>
 
-        <!-- Terms -->
+        <!-- Terms checkbox -->
         <div class="form-group" style="display:flex;align-items:flex-start;gap:12px;margin-top:8px;">
-          <input
-            type="checkbox"
-            id="agreeTerms"
-            name="terms"
-            required
-            style="width:18px;height:18px;flex-shrink:0;margin-top:2px;accent-color:var(--amber);"
-          />
+          <input type="checkbox" id="agreeTerms" name="terms" required
+                 style="width:18px;height:18px;flex-shrink:0;margin-top:2px;accent-color:var(--amber);" />
           <label for="agreeTerms" style="font-size:0.85rem;color:var(--text-muted);text-transform:none;letter-spacing:0;">
-            I confirm that I own this account and agree to PUBGVault's
-            <a href="#" style="color:var(--amber);">Terms of Service</a> and
-            <a href="#" style="color:var(--amber);">Seller Guidelines</a>.
+            <span data-i18n="sell.terms">I confirm that I own this account and agree to DIGIVAULT's Terms of Service and Seller Guidelines.</span>
           </label>
         </div>
 
         <!-- Submit -->
-        <button type="submit" class="btn btn-primary btn-submit" style="width:100%;justify-content:center;margin-top:16px;font-size:1rem;padding:16px;">
+        <button type="submit" class="btn btn-primary btn-submit"
+                data-i18n="sell.submit"
+                style="width:100%;justify-content:center;margin-top:16px;font-size:1rem;padding:16px;">
           📤 Submit Listing for Review
         </button>
 
-        <p style="text-align:center;font-size:0.78rem;color:var(--text-muted);margin-top:14px;">
+        <p data-i18n="sell.encrypt"
+           style="text-align:center;font-size:0.78rem;color:var(--text-muted);margin-top:14px;">
           🔒 Your information is encrypted and never shared with third parties.
         </p>
 
@@ -472,39 +327,28 @@
     <!-- ---- TIPS SIDEBAR ---- -->
     <aside class="tips-panel" aria-label="Listing tips">
       <div class="tips-card">
-        <h3>💡 Listing Tips</h3>
-
-        <div class="tip-item">
-          <span class="tip-icon">📸</span>
-          <span>Upload clear screenshots of your rank, inventory, and skins — listings with photos sell 3× faster.</span>
-        </div>
-        <div class="tip-item">
-          <span class="tip-icon">💰</span>
-          <span>Check recent sold listings to price competitively. Overpriced accounts sit unsold for weeks.</span>
-        </div>
-        <div class="tip-item">
-          <span class="tip-icon">📝</span>
-          <span>Mention everything valuable: UC balance, classic titles, legendary outfits, weapon skins.</span>
-        </div>
-        <div class="tip-item">
-          <span class="tip-icon">⚡</span>
-          <span>Respond to buyer messages within 1 hour to boost your response score and listing rank.</span>
-        </div>
-        <div class="tip-item">
-          <span class="tip-icon">🛡️</span>
-          <span>Never share account credentials until the platform confirms the buyer's payment is secured.</span>
-        </div>
+        <h3 data-i18n="tips.title">💡 Listing Tips</h3>
+        <div class="tip-item"><span class="tip-icon">📸</span><span data-i18n="tip.1">Upload clear screenshots — listings with photos get 3× more views.</span></div>
+        <div class="tip-item"><span class="tip-icon">💰</span><span data-i18n="tip.2">Check recent sold listings to price competitively in IQD.</span></div>
+        <div class="tip-item"><span class="tip-icon">🆔</span><span data-i18n="tip.3">Mention your Account ID, level, and exact number of collections.</span></div>
+        <div class="tip-item"><span class="tip-icon">⚡</span><span data-i18n="tip.4">Respond to buyer messages within 1 hour to boost your seller level.</span></div>
+        <div class="tip-item"><span class="tip-icon">🛡️</span><span data-i18n="tip.5">Never share account credentials until payment is secured.</span></div>
       </div>
 
       <!-- Live preview card -->
       <div class="preview-card">
-        <h4>👁 Live Preview</h4>
+        <h4 data-i18n="preview.card.title">👁 Live Preview</h4>
         <div class="preview-title" id="previewTitle">Account Name</div>
-        <div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:10px;" id="previewTier">— Select a tier —</div>
-        <div class="preview-price" id="previewPrice">$0</div>
-        <div style="margin-top:10px;font-size:0.78rem;color:var(--text-muted);line-height:1.5;" id="previewDesc">
-          Your description will appear here…
-        </div>
+        <div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:10px;" id="previewLevel">Level — </div>
+        <div class="preview-price" id="previewPrice">0 IQD</div>
+        <div style="margin-top:10px;font-size:0.78rem;color:var(--text-muted);line-height:1.5;" id="previewDesc">Your description will appear here…</div>
+      </div>
+
+      <!-- DV Coin widget -->
+      <div style="background:rgba(14,165,233,0.06);border:1px solid rgba(14,165,233,0.2);border-radius:var(--radius);padding:20px;margin-top:20px;text-align:center;">
+        <div style="font-size:2rem;margin-bottom:8px;">🪙</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:0.06em;color:var(--amber);margin-bottom:6px;">Boost with DV Coins</div>
+        <div style="font-size:0.78rem;color:var(--text-muted);line-height:1.6;">Promote listing for 24h — 5 DV Coins<br>Promote for 7 days — 25 DV Coins</div>
       </div>
     </aside>
 
@@ -515,7 +359,7 @@
   <footer class="footer">
     <div class="footer-inner">
       <div class="footer-bottom">
-        <p class="footer-copy">&copy; 2025 <span>PUBGVault</span>. All rights reserved.</p>
+        <p class="footer-copy" data-i18n="footer.copy">© 2025 DIGIVAULT. All rights reserved.</p>
         <div class="footer-social">
           <a href="#" class="social-btn">💬</a>
           <a href="#" class="social-btn">✈️</a>
@@ -523,80 +367,100 @@
         </div>
       </div>
     </div>
+    <div id="lang-switcher"></div>
   </footer>
 
   <script src="script.js"></script>
+  <script src="api.js"></script>
+  <script src="i18n.js"></script>
   <script>
-    /* ---- Tier selection ---- */
-    function selectTier(el) {
-      document.querySelectorAll('.tier-option').forEach(o => o.classList.remove('selected'));
-      el.classList.add('selected');
-      document.getElementById('accountTier').value = el.dataset.tier;
-      updatePreview();
-    }
+    /* ---- Auth gate check ---- */
+    (function checkAuth() {
+      var user = null;
+      try { user = JSON.parse(localStorage.getItem('tw_user')); } catch(e) {}
+      if (!user) try { user = JSON.parse(null); } catch(e) {}
+      var gate = document.getElementById('registerGate');
+      var form = document.getElementById('sellForm');
+      if (!user) {
+        /* Not logged in: show gate, hide form */
+        gate.style.display = 'block';
+        if (form) form.style.display = 'none';
+      } else {
+        /* Logged in: hide gate, show form */
+        gate.style.display = 'none';
+        if (form) form.style.display = 'block';
+      }
+    })();
 
-    // Keyboard accessibility for tier options
-    document.querySelectorAll('.tier-option').forEach(opt => {
-      opt.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectTier(opt); }
-      });
-    });
-
-    /* ---- Character counter for description ---- */
-    const descTA = document.getElementById('accountDescription');
+    /* ---- Character counter ---- */
+    const descTA    = document.getElementById('accountDescription');
     const descCount = document.getElementById('descCount');
     descTA.addEventListener('input', () => {
       descCount.textContent = descTA.value.length;
       updatePreview();
     });
 
-    /* ---- Live Preview updates ---- */
+    /* ---- Live preview ---- */
     function updatePreview() {
-      const name = document.getElementById('accountName').value || 'Account Name';
+      const name  = document.getElementById('accountName').value  || 'Account Name';
       const price = document.getElementById('accountPrice').value;
-      const desc = document.getElementById('accountDescription').value;
-      const tier = document.getElementById('accountTier').value;
+      const level = document.getElementById('accountLevel').value;
+      const desc  = document.getElementById('accountDescription').value;
 
       document.getElementById('previewTitle').textContent = name;
-      document.getElementById('previewPrice').textContent = price ? `$${parseFloat(price).toFixed(2)}` : '$0';
+      document.getElementById('previewLevel').textContent = level ? `Level ${level}` : 'Level —';
+      document.getElementById('previewPrice').textContent = price
+        ? `${parseInt(price).toLocaleString()} IQD`
+        : '0 IQD';
       document.getElementById('previewDesc').textContent = desc
         ? (desc.length > 120 ? desc.slice(0, 120) + '…' : desc)
         : 'Your description will appear here…';
-
-      const tierLabels = {
-        conqueror: '👑 Conqueror',
-        ace: '🏆 Ace',
-        crown: '💫 Crown',
-        diamond: '💎 Diamond',
-        platinum: '🥈 Platinum',
-        gold: '🥇 Gold',
-      };
-      document.getElementById('previewTier').textContent = tier ? tierLabels[tier] : '— Select a tier —';
     }
 
-    ['accountName', 'accountPrice'].forEach(id => {
+    ['accountName', 'accountPrice', 'accountLevel'].forEach(id => {
       document.getElementById(id).addEventListener('input', updatePreview);
     });
 
-    /* ---- Step progress update on scroll ---- */
-    const sellForm = document.getElementById('sellForm');
-    const steps = document.querySelectorAll('.progress-step');
-
-    const mediaSection = document.getElementById('imageUploadZone');
-    const reviewObs = new IntersectionObserver((entries) => {
+    /* ---- Progress step update on scroll ---- */
+    const steps       = document.querySelectorAll('.progress-step');
+    const mediaZone   = document.getElementById('imageUploadZone');
+    const progressObs = new IntersectionObserver((entries) => {
       entries.forEach(e => {
-        if (e.isIntersecting) {
-          steps[0].classList.remove('active');
-          steps[0].classList.add('done');
-          steps[1].classList.add('active');
-        } else {
-          steps[0].classList.add('active');
-          steps[0].classList.remove('done');
-          steps[1].classList.remove('active');
-        }
+        const mediaVisible = e.isIntersecting;
+        steps[0].classList.toggle('done',   mediaVisible);
+        steps[0].classList.toggle('active', !mediaVisible);
+        steps[1].classList.toggle('active',  mediaVisible);
       });
     }, { threshold: 0.3 });
-    if (mediaSection) reviewObs.observe(mediaSection);
+    if (mediaZone) progressObs.observe(mediaZone);
+
+    /* ---- Video duration validation (max 2 min) ---- */
+    document.getElementById('accountVideo').addEventListener('change', function() {
+      const file = this.files[0];
+      if (!file) return;
+      const video = document.createElement('video');
+      video.preload = 'metadata';
+      video.onloadedmetadata = () => {
+        URL.revokeObjectURL(video.src);
+        if (video.duration > 120) {
+          showToast('⚠️ Video Too Long', 'Please upload a video under 2 minutes.');
+          this.value = '';
+          document.getElementById('videoPreviews').innerHTML = '';
+        }
+      };
+      video.src = URL.createObjectURL(file);
+    });
+  </script>
+  <script>
+    /* ── Theme toggle ── */
+    (function(){
+      if(localStorage.getItem('tw_theme')==='light')
+        document.body.classList.add('light-mode');
+    })();
+    function toggleTheme(){
+      var light = document.body.classList.toggle('light-mode');
+      localStorage.setItem('tw_theme', light ? 'light' : 'dark');
+    }
   </script>
 </body>
 </html>

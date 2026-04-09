@@ -1,226 +1,473 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="PUBGVault — Buy and sell PUBG Mobile accounts safely and easily on the most trusted gaming account marketplace." />
-  <title>PUBGVault — Buy & Sell PUBG Mobile Accounts</title>
+  <meta name="description" content="DIGIVAULT — Buy and sell digital accounts, game accounts, website templates and digital assets safely on the most trusted marketplace." />
+  <title>DIGIVAULT — Digital Technology Marketplace</title>
   <link rel="stylesheet" href="style.css" />
-  <!-- Favicon emoji fallback -->
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='16' fill='%230ea5e9'/><text x='50%25' y='62%25' text-anchor='middle' font-size='52' font-weight='900' fill='%2303080f' font-family='Arial'>DV</text></svg>" />
+  <style>
+    /* DV Coin Section */
+    .tccoin-section { background: linear-gradient(135deg, rgba(3,8,15,0.8), rgba(10,22,48,0.6)); }
+    .tccoin-grid { display:grid; grid-template-columns:1fr 1fr; gap:60px; align-items:center; }
+    .tccoin-visual { display:flex; justify-content:center; align-items:center; }
+    .coin-3d {
+      width:180px; height:180px; border-radius:50%;
+      background: radial-gradient(circle at 35% 35%, #f5d76e, #c8860a 60%, #7b4f00);
+      box-shadow: 6px 6px 20px rgba(0,0,0,0.5), inset -4px -4px 12px rgba(0,0,0,0.3), inset 2px 2px 8px rgba(255,255,255,0.2);
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      animation: coinFloat 4s ease-in-out infinite;
+      position:relative;
+    }
+    .coin-3d::after {
+      content:''; position:absolute; inset:8px; border-radius:50%;
+      border:2px solid rgba(255,220,100,0.4);
+    }
+    .coin-tc { font-family:'Bebas Neue',sans-serif; font-size:3.5rem; color:var(--brown-950); letter-spacing:0.06em; line-height:1; }
+    .coin-label { font-size:0.7rem; font-weight:700; letter-spacing:0.14em; color:var(--brown-800); text-transform:uppercase; }
+    @keyframes coinFloat {
+      0%,100% { transform:translateY(0) rotateY(0); }
+      50% { transform:translateY(-12px) rotateY(10deg); }
+    }
+    .tccoin-feats { display:flex; flex-direction:column; gap:20px; margin-top:32px; }
+    .tc-feat { display:flex; gap:16px; align-items:flex-start; }
+    .tc-feat-icon { width:44px; height:44px; border-radius:10px; background:rgba(14,165,233,0.12); border:1px solid rgba(14,165,233,0.25); display:flex; align-items:center; justify-content:center; font-size:1.2rem; flex-shrink:0; }
+    .tc-feat-title { font-family:'Bebas Neue',sans-serif; font-size:1rem; letter-spacing:0.06em; color:var(--amber); margin-bottom:3px; }
+    .tc-feat-desc { font-size:0.83rem; color:var(--text-muted); line-height:1.6; }
+
+    /* Promoted / Featured Section on homepage */
+    .promoted-section { padding:80px 0; }
+    .promoted-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:24px; margin-top:40px; max-width:1200px; margin-left:auto; margin-right:auto; padding:0 5%; }
+    .account-card.promoted { border-color:rgba(14,165,233,0.45); background:linear-gradient(145deg,rgba(15,32,53,0.25),rgba(6,13,28,0.4)); }
+    .promoted-badge { position:absolute; top:12px; left:12px; background:var(--amber); color:var(--brown-950); font-size:0.68rem; font-weight:800; letter-spacing:0.1em; text-transform:uppercase; padding:3px 9px; border-radius:100px; z-index:2; }
+
+    /* Dashboard Modal */
+    .dash-modal-overlay {
+      position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:9990;
+      display:none; align-items:center; justify-content:center; padding:20px;
+    }
+    .dash-modal-overlay.open { display:flex; }
+    .dash-modal {
+      background:var(--brown-900); border:1px solid var(--card-bdr); border-radius:20px;
+      width:100%; max-width:680px; max-height:90vh; overflow-y:auto; padding:40px;
+      position:relative; animation:slideUp 0.35s ease;
+    }
+    @keyframes slideUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+    .dash-close { position:absolute; top:20px; right:20px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:8px; width:34px; height:34px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--text-muted); font-size:1rem; transition:var(--transition); }
+    .dash-close:hover { background:rgba(14,165,233,0.15); color:var(--amber); }
+    .dash-tabs { display:flex; gap:4px; border-bottom:1px solid rgba(255,255,255,0.08); margin-bottom:28px; }
+    .dash-tab { padding:10px 18px; font-size:0.82rem; font-weight:600; color:var(--text-muted); cursor:pointer; border-bottom:2px solid transparent; transition:var(--transition); letter-spacing:0.04em; }
+    .dash-tab.active { color:var(--amber); border-bottom-color:var(--amber); }
+    .dash-panel { display:none; }
+    .dash-panel.active { display:block; }
+    .level-badge { display:inline-flex; align-items:center; gap:8px; padding:10px 20px; border-radius:100px; font-weight:700; font-size:0.9rem; letter-spacing:0.05em; margin-bottom:16px; }
+    .level-badge.bronze { background:rgba(205,127,50,0.2); border:1.5px solid rgba(205,127,50,0.5); color:#cd7f32; }
+    .level-badge.silver { background:rgba(192,192,192,0.15); border:1.5px solid rgba(192,192,192,0.4); color:#c0c0c0; }
+    .level-badge.gold   { background:rgba(14,165,233,0.2); border:1.5px solid rgba(14,165,233,0.5); color:var(--amber); }
+    .level-bar-wrap { background:rgba(255,255,255,0.06); border-radius:100px; height:8px; margin:10px 0 6px; overflow:hidden; }
+    .level-bar { height:100%; border-radius:100px; background:linear-gradient(to right,var(--amber),var(--amber-lt)); transition:width 1s ease; }
+    .dash-profile-img { width:80px; height:80px; border-radius:50%; background:rgba(14,165,233,0.15); border:2px solid var(--card-bdr); display:flex; align-items:center; justify-content:center; font-size:2.2rem; margin-bottom:16px; }
+    .dash-stat-row { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:20px 0; }
+    .dash-stat { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.07); border-radius:12px; padding:16px; text-align:center; }
+    .dash-stat-num { font-family:'Bebas Neue',sans-serif; font-size:1.6rem; color:var(--amber); }
+    .dash-stat-lbl { font-size:0.72rem; color:var(--text-muted); letter-spacing:0.06em; text-transform:uppercase; margin-top:2px; }
+    .dash-listing-item { display:flex; align-items:center; gap:14px; padding:14px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:10px; margin-bottom:10px; }
+    .dash-listing-icon { width:46px; height:46px; border-radius:10px; background:rgba(14,165,233,0.1); display:flex; align-items:center; justify-content:center; font-size:1.3rem; flex-shrink:0; }
+    .dash-listing-name { font-weight:600; font-size:0.9rem; color:var(--cream); }
+    .dash-listing-meta { font-size:0.75rem; color:var(--text-muted); margin-top:2px; }
+    .dash-listing-price { margin-left:auto; font-family:'Bebas Neue',sans-serif; font-size:1.1rem; color:var(--amber); }
+    .tc-coin-display { display:flex; align-items:center; gap:14px; background:rgba(14,165,233,0.08); border:1px solid rgba(14,165,233,0.25); border-radius:14px; padding:20px; margin-bottom:20px; }
+    .tc-coin-amount { font-family:'Bebas Neue',sans-serif; font-size:2.4rem; color:var(--amber); }
+    .tc-coin-lbl { font-size:0.78rem; color:var(--text-muted); letter-spacing:0.06em; text-transform:uppercase; }
+
+    @media(max-width:768px){
+      .tccoin-grid{grid-template-columns:1fr;}
+      .tccoin-visual{margin-bottom:20px;}
+      .dash-stat-row{grid-template-columns:repeat(2,1fr);}
+    }
+  </style>
 </head>
 <body>
 
-  <!-- ============================================================
-       NAVBAR
-  ============================================================ -->
-  <nav class="navbar" role="navigation" aria-label="Main navigation">
-    <a href="index.html" class="nav-logo" aria-label="PUBGVault Home">
-      <div class="logo-icon" aria-hidden="true">🎮</div>
-      PUBG<span>Vault</span>
+  <!-- NAVBAR -->
+  <nav class="navbar" role="navigation">
+    <a href="index.html" class="nav-logo" aria-label="DIGIVAULT Home">
+      <div class="logo-icon" aria-hidden="true" style="font-family:'Bebas Neue',sans-serif;font-size:0.78rem;font-weight:900;letter-spacing:0.04em;">DV</div>
+      DIGI<span>VAULT</span>
     </a>
 
     <ul class="nav-links" role="list">
-      <li><a href="index.html" class="active">Home</a></li>
-      <li><a href="#features">Features</a></li>
-      <li><a href="#how-it-works">How It Works</a></li>
-      <li><a href="#contact">Contact</a></li>
-      <li><a href="market.html" class="nav-cta">Marketplace</a></li>
+      <li><a href="index.html" class="active" data-i18n="nav.home">Home</a></li>
+      <li><a href="#features" data-i18n="nav.features">Features</a></li>
+      <li><a href="#how-it-works" data-i18n="nav.howItWorks">How It Works</a></li>
+      <li><a href="#contact" data-i18n="nav.contact">Contact</a></li>
     </ul>
 
-    <!-- Hamburger for mobile -->
-    <button class="hamburger" aria-label="Toggle mobile menu" aria-expanded="false">
-      <span></span><span></span><span></span>
-    </button>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <button onclick="openAccountPage()"
+        title="My Account"
+        style="width:40px;height:40px;border-radius:50%;background:rgba(14,165,233,.12);border:1.5px solid rgba(14,165,233,.32);display:flex;align-items:center;justify-content:center;font-size:1.15rem;cursor:pointer;transition:var(--transition);flex-shrink:0;"
+        onmouseover="this.style.background='rgba(14,165,233,.22)';this.style.borderColor='var(--amber)'"
+        onmouseout="this.style.background='rgba(14,165,233,.12)';this.style.borderColor='rgba(14,165,233,.32)'">
+        👤
+      </button>
+      <span id="navCoinPill" onclick="typeof TW!=='undefined'&&TW.openBuyCoins()" title="DV Coins — click to buy more" style="display:none;align-items:center;gap:5px;background:linear-gradient(135deg,rgba(245,158,11,.14),rgba(200,134,10,.07));border:1px solid rgba(245,158,11,.28);border-radius:100px;padding:5px 12px;font-size:.78rem;font-weight:700;color:#f59e0b;cursor:pointer;white-space:nowrap;transition:all .3s;height:36px;"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;"><circle cx="8" cy="8" r="7.5" fill="url(#cg)" stroke="rgba(200,134,10,0.4)" stroke-width="0.5"/><circle cx="8" cy="8" r="5.5" fill="none" stroke="rgba(255,220,80,0.35)" stroke-width="0.8"/><text x="8" y="11.5" text-anchor="middle" font-size="7" font-weight="900" font-family="Arial,sans-serif" fill="#7b3f00" letter-spacing="-0.3">DV</text><defs><radialGradient id="cg" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#f5d76e"/><stop offset="60%" stop-color="#c8860a"/><stop offset="100%" stop-color="#7b4f00"/></radialGradient></defs></svg> <span id="navCoinCount">0</span></span>
+      <button class="theme-toggle" onclick="toggleTheme()" title="Toggle light/dark mode" aria-label="Toggle theme">
+        <span class="icon-moon">🌙</span>
+        <span class="icon-sun">☀️</span>
+      </button>
+      <div id="lang-switcher"></div>
+      <button class="hamburger" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
   </nav>
 
-  <!-- Mobile menu -->
-  <nav class="mobile-menu" aria-label="Mobile navigation">
+  <nav class="mobile-menu">
     <a href="index.html">Home</a>
     <a href="#features">Features</a>
     <a href="#how-it-works">How It Works</a>
     <a href="#contact">Contact</a>
     <a href="market.html">Marketplace →</a>
+    <a href="javascript:openAccountPage()">👤 My Account</a>
   </nav>
 
-  <!-- ============================================================
-       HERO SECTION
-  ============================================================ -->
-  <main>
-  <section class="hero" aria-labelledby="hero-title">
-    <div class="hero-grid">
+  <!-- DASHBOARD MODAL -->
+  <div class="dash-modal-overlay" id="dashModal" onclick="if(event.target===this)closeDashboard()">
+    <div class="dash-modal">
+      <button class="dash-close" onclick="closeDashboard()">✕</button>
+      <h2 style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:0.06em;color:var(--cream);margin-bottom:6px;" data-i18n="dash.title">My Dashboard</h2>
+      <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:20px;">Welcome back, <strong style="color:var(--amber)">ShadowUser_99</strong> 🎉</p>
 
-      <!-- Left — Copy -->
-      <div class="hero-content">
-        <div class="hero-badge">
-          <span class="dot" aria-hidden="true"></span>
-          #1 PUBG Account Marketplace
+      <div class="dash-tabs">
+        <div class="dash-tab active" onclick="switchTab(this,'tab-profile')" data-i18n="dash.profile">Profile</div>
+        <div class="dash-tab" onclick="switchTab(this,'tab-listings')" data-i18n="dash.listings">My Listings</div>
+        <div class="dash-tab" onclick="switchTab(this,'tab-level')" data-i18n="dash.level">My Level</div>
+        <div class="dash-tab" onclick="switchTab(this,'tab-coins')" data-i18n="dash.tccoin">DV Coins</div>
+      </div>
+
+      <!-- Profile Tab -->
+      <div class="dash-panel active" id="tab-profile">
+        <div class="dash-profile-img">👤</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:var(--cream);letter-spacing:0.06em;">ShadowUser_99</div>
+        <div style="font-size:0.82rem;color:var(--text-muted);margin-bottom:16px;">Member since 2024 · Erbil, Kurdistan</div>
+        <div style="font-size:0.88rem;color:var(--text-muted);line-height:1.7;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:14px;margin-bottom:20px;">
+          Trusted seller specializing in game accounts and digital assets. Fast delivery, verified listings only.
         </div>
-
-        <h1 class="hero-title" id="hero-title">
-          Buy &amp; Sell
-          <span class="highlight">PUBG Mobile</span>
-          Accounts Easily
-        </h1>
-
-        <p class="hero-desc">
-          The most trusted platform for trading high-tier PUBG Mobile accounts.
-          Safe transactions, verified listings, and lightning-fast deals — all in one place.
-        </p>
-
-        <div class="hero-actions">
-          <a href="market.html" class="btn btn-primary btn-lg">
-            🚀 Get Started
-          </a>
-          <a href="#features" class="btn btn-outline btn-lg">
-            Learn More ↓
-          </a>
+        <div class="dash-stat-row">
+          <div class="dash-stat"><div class="dash-stat-num">3</div><div class="dash-stat-lbl">Listings</div></div>
+          <div class="dash-stat"><div class="dash-stat-num">12</div><div class="dash-stat-lbl">Sales</div></div>
+          <div class="dash-stat"><div class="dash-stat-num">4.9⭐</div><div class="dash-stat-lbl">Rating</div></div>
         </div>
+        <a href="sell.html" class="btn btn-primary" style="display:inline-flex;margin-top:8px;">+ Add New Listing</a>
+      </div>
 
-        <!-- Stats row -->
-        <div class="hero-stats" aria-label="Platform statistics">
-          <div class="stat-item">
-            <div class="stat-num" data-target="12000" data-suffix="+">0+</div>
-            <div class="stat-label">Accounts Sold</div>
+      <!-- Listings Tab -->
+      <div class="dash-panel" id="tab-listings">
+        <div class="dash-listing-item">
+          <div class="dash-listing-icon">🪖</div>
+          <div>
+            <div class="dash-listing-name">ShadowStrike_X99</div>
+            <div class="dash-listing-meta">🏆 Ace · Level 92 · Active</div>
           </div>
-          <div class="stat-item">
-            <div class="stat-num" data-target="8500" data-suffix="+">0+</div>
-            <div class="stat-label">Happy Users</div>
+          <div class="dash-listing-price">450,000 IQD</div>
+        </div>
+        <div class="dash-listing-item">
+          <div class="dash-listing-icon">⚡</div>
+          <div>
+            <div class="dash-listing-name">StormBringer_7</div>
+            <div class="dash-listing-meta">👑 Conqueror · Level 88 · Active</div>
           </div>
-          <div class="stat-item">
-            <div class="stat-num" data-target="99" data-suffix="%">0%</div>
-            <div class="stat-label">Satisfaction Rate</div>
+          <div class="dash-listing-price">780,000 IQD</div>
+        </div>
+        <div class="dash-listing-item">
+          <div class="dash-listing-icon">🌐</div>
+          <div>
+            <div class="dash-listing-name">Portfolio Website Template</div>
+            <div class="dash-listing-meta">Website Template · Active</div>
+          </div>
+          <div class="dash-listing-price">120,000 IQD</div>
+        </div>
+        <a href="sell.html" class="btn btn-outline" style="display:inline-flex;margin-top:16px;font-size:0.85rem;">+ New Listing</a>
+      </div>
+
+      <!-- Level Tab -->
+      <div class="dash-panel" id="tab-level">
+        <div class="level-badge gold">🏆 Gold Seller — Level 3</div>
+        <p style="font-size:0.85rem;color:var(--text-muted);line-height:1.7;margin-bottom:16px;">Your level is based on the number of successful listings and sales. Higher levels unlock priority listing placement and exclusive badges.</p>
+        <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:4px;">Progress to next level</div>
+        <div class="level-bar-wrap"><div class="level-bar" style="width:68%"></div></div>
+        <div style="font-size:0.75rem;color:var(--text-muted);">12 / 20 sales to Platinum</div>
+        <div style="margin-top:24px;display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;align-items:center;gap:10px;font-size:0.82rem;color:var(--text-muted);">
+            <span style="color:#cd7f32">🥉</span> Bronze — 0 sales
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:0.82rem;color:var(--text-muted);">
+            <span style="color:#c0c0c0">🥈</span> Silver — 5 sales
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:0.82rem;color:var(--amber);">
+            <span>🥇</span> Gold — 10 sales (Current)
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:0.82rem;color:var(--text-muted);">
+            <span>💎</span> Platinum — 20 sales
           </div>
         </div>
       </div>
 
-      <!-- Right — Visual card mockup -->
+      <!-- DV Coins Tab -->
+      <div class="dash-panel" id="tab-coins">
+        <div class="tc-coin-display">
+          <div style="font-size:2.5rem;">🪙</div>
+          <div>
+            <div class="tc-coin-amount">125</div>
+            <div class="tc-coin-lbl">DV Coins Available</div>
+          </div>
+        </div>
+        <p style="font-size:0.85rem;color:var(--text-muted);line-height:1.7;margin-bottom:20px;">Use DV Coins to promote your listings and gain more visibility in the marketplace.</p>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:14px;">
+            <div>
+              <div style="font-size:0.88rem;color:var(--cream);font-weight:600;">Promote for 24h</div>
+              <div style="font-size:0.75rem;color:var(--text-muted);">Featured in top search results</div>
+            </div>
+            <span style="background:var(--amber);color:var(--brown-950);padding:6px 14px;border-radius:8px;font-weight:700;font-size:0.82rem;cursor:pointer;">5 🪙</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:14px;">
+            <div>
+              <div style="font-size:0.88rem;color:var(--cream);font-weight:600;">Promote for 7 days</div>
+              <div style="font-size:0.75rem;color:var(--text-muted);">Priority placement all week</div>
+            </div>
+            <span style="background:var(--amber);color:var(--brown-950);padding:6px 14px;border-radius:8px;font-weight:700;font-size:0.82rem;cursor:pointer;">25 🪙</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <main>
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="hero-grid">
+      <div class="hero-content">
+        <div class="hero-badge">
+          <span class="dot" aria-hidden="true"></span>
+          <span data-i18n="hero.badge">#1 Digital Technology Marketplace</span>
+        </div>
+
+        <h1 class="hero-title" id="hero-title" data-i18n-html="hero.title">
+          Buy &amp; Sell <span class="highlight">Digital Assets</span> Safely &amp; Easily
+        </h1>
+
+        <p class="hero-desc" data-i18n="hero.desc">
+          The most trusted platform for trading game accounts, website templates, and digital assets. Safe transactions, verified listings, and lightning-fast deals — all in one place.
+        </p>
+
+        <div class="hero-actions">
+          <a href="market.html" class="btn btn-primary btn-lg" data-i18n="hero.getStarted">🚀 Get Started</a>
+          <a href="#features"   class="btn btn-outline btn-lg" data-i18n="hero.learnMore">Learn More ↓</a>
+        </div>
+      </div>
+
+      <!-- Visual mockup card -->
       <div class="hero-visual" aria-hidden="true">
-        <!-- Floating info badges -->
         <div class="hero-floating-badge badge-top">
           <span class="badge-icon">🔒</span>
           <div>
-            <div style="font-weight:600;font-size:.82rem;color:var(--cream)">Secure Payment</div>
-            <div style="font-size:.73rem;color:var(--text-muted)">Escrow protected</div>
+            <div style="font-weight:600;font-size:.82rem;color:var(--cream)" data-i18n="badge.secure">Secure Payment</div>
+            <div style="font-size:.73rem;color:var(--text-muted)" data-i18n="badge.secureDesc">Escrow protected</div>
           </div>
         </div>
 
         <div class="hero-card-mockup">
           <div class="mockup-header">
-            <span class="mockup-badge">⭐ Legendary</span>
-            <span class="mockup-price">$249</span>
+            <span class="mockup-badge" data-i18n="mockup.badge">⭐ Legendary</span>
+            <span class="mockup-price" data-i18n="mockup.price">325,000 IQD</span>
           </div>
           <div class="mockup-img">🪖</div>
-          <div class="mockup-title">Ace Dominator Account</div>
+          <div class="mockup-title" data-i18n="mockup.title">Ace Dominator Account</div>
           <div class="mockup-meta">
-            <span>🏆 Level 82</span>
-            <span>🔫 All Guns Maxed</span>
+            <span data-i18n="mockup.level">🏆 Level 82</span>
+            <span data-i18n="mockup.guns">🔫 All Items Maxed</span>
           </div>
-          <button class="mockup-btn">View Account →</button>
+          <button class="mockup-btn" data-i18n="mockup.btn">View Account →</button>
         </div>
 
         <div class="hero-floating-badge badge-bottom">
           <span class="badge-icon">⚡</span>
           <div>
-            <div style="font-weight:600;font-size:.82rem;color:var(--cream)">Fast Transfer</div>
-            <div style="font-size:.73rem;color:var(--text-muted)">Avg. 2 hrs delivery</div>
+            <div style="font-weight:600;font-size:.82rem;color:var(--cream)" data-i18n="badge.fast">Fast Transfer</div>
+            <div style="font-size:.73rem;color:var(--text-muted)" data-i18n="badge.fastDesc">Avg. 2 hrs delivery</div>
           </div>
         </div>
       </div>
-
     </div>
   </section>
 
   <div class="section-divider"></div>
 
-  <!-- ============================================================
-       FEATURES SECTION
-  ============================================================ -->
+  <!-- FEATURED / PROMOTED LISTINGS -->
+  <section class="promoted-section" id="featured" style="padding:80px 0;">
+    <div class="section-inner" style="padding:0 5%;">
+      <div class="text-center reveal">
+        <p class="section-tag" style="justify-content:center;">🔥 Hot Right Now</p>
+        <h2 class="section-title">Featured Listings</h2>
+        <p class="section-sub" style="margin:0 auto;">Hand-picked, verified accounts promoted by our team. Premium quality guaranteed.</p>
+      </div>
+    </div>
+    <div class="promoted-grid" style="margin-top:40px;">
+      <article class="account-card promoted reveal" style="position:relative;" data-tier="ace">
+        <div class="promoted-badge" data-i18n="market.promoted">🔥 Promoted</div>
+        <div class="ac-img">🪖<span class="ac-level">Lvl 92</span></div>
+        <div class="ac-body">
+          <h3 class="ac-name">ShadowStrike_X99</h3>
+          <div class="ac-meta"><span>🏆 Ace Dominator</span><span>🔫 All Skins</span></div>
+          <div style="display:flex;align-items:baseline;gap:6px;"><span class="ac-price">450,000</span><span class="ac-price-label">IQD</span></div>
+        </div>
+        <div class="ac-footer"><a href="market.html" class="btn btn-primary" style="width:100%;justify-content:center;padding:10px;" data-i18n="market.view">View</a></div>
+      </article>
+      <article class="account-card promoted reveal reveal-delay-1" style="position:relative;" data-tier="ace">
+        <div class="promoted-badge" data-i18n="market.promoted">🔥 Promoted</div>
+        <div class="ac-img">⚡<span class="ac-level">Lvl 88</span></div>
+        <div class="ac-body">
+          <h3 class="ac-name">StormBringer_7</h3>
+          <div class="ac-meta"><span>👑 Conqueror</span><span>🎖️ Classic Titles</span></div>
+          <div style="display:flex;align-items:baseline;gap:6px;"><span class="ac-price">780,000</span><span class="ac-price-label">IQD</span></div>
+        </div>
+        <div class="ac-footer"><a href="market.html" class="btn btn-primary" style="width:100%;justify-content:center;padding:10px;" data-i18n="market.view">View</a></div>
+      </article>
+      <article class="account-card promoted reveal reveal-delay-2" style="position:relative;">
+        <div class="promoted-badge" data-i18n="market.promoted">🔥 Promoted</div>
+        <div class="ac-img">🌐<span class="ac-level">HTML</span></div>
+        <div class="ac-body">
+          <h3 class="ac-name">SaaS Landing Template</h3>
+          <div class="ac-meta"><span>🌐 Website Template</span><span>✅ Clean Code</span></div>
+          <div style="display:flex;align-items:baseline;gap:6px;"><span class="ac-price">85,000</span><span class="ac-price-label">IQD</span></div>
+        </div>
+        <div class="ac-footer"><a href="market.html" class="btn btn-primary" style="width:100%;justify-content:center;padding:10px;" data-i18n="market.view">View</a></div>
+      </article>
+    </div>
+    <div style="text-align:center;margin-top:36px;">
+      <a href="market.html" class="btn btn-outline">Browse All Listings →</a>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- FEATURES -->
   <section class="section features-section" id="features" aria-labelledby="features-title">
     <div class="section-inner">
       <div class="text-center">
         <p class="section-tag">Why Choose Us</p>
-        <h2 class="section-title" id="features-title">Built for Gamers,<br>Trusted by Thousands</h2>
-        <p class="section-sub">
-          Every feature is designed to make your trading experience safe, fast, and completely hassle-free.
-        </p>
+        <h2 class="section-title" id="features-title">Simple Deals,<br>Direct Connections</h2>
+        <p class="section-sub">Connect directly with sellers, discuss details, and make agreements easily. Our platform is built to make buying and selling digital assets fast, clear, and flexible.</p>
       </div>
 
       <div class="features-grid">
-
-        <!-- Card 1 -->
         <article class="feature-card reveal">
           <div class="feature-icon" aria-hidden="true">🔒</div>
-          <h3 class="feature-title">Secure Trading</h3>
-          <p class="feature-desc">
-            All transactions are protected by our escrow system. Funds are only released after the buyer confirms a successful account transfer.
-          </p>
+          <h3 class="feature-title">Direct Contact</h3>
+          <p  class="feature-desc">Buyers can contact sellers directly to ask questions, negotiate price, and agree on the deal before purchasing.</p>
         </article>
-
-        <!-- Card 2 -->
         <article class="feature-card reveal reveal-delay-1">
           <div class="feature-icon" aria-hidden="true">⚡</div>
-          <h3 class="feature-title">Fast Listings</h3>
-          <p class="feature-desc">
-            Create and publish your account listing in under 2 minutes. Our streamlined form makes selling quick and effortless.
-          </p>
+          <h3 class="feature-title">Flexible Agreements</h3>
+          <p  class="feature-desc">No restrictions — buyer and seller can agree on payment method, delivery, and terms that work best for both sides.</p>
         </article>
-
-        <!-- Card 3 -->
         <article class="feature-card reveal reveal-delay-2">
           <div class="feature-icon" aria-hidden="true">✅</div>
-          <h3 class="feature-title">Trusted Platform</h3>
-          <p class="feature-desc">
-            Every seller is verified and every listing is reviewed. Buyer protection and a dispute resolution team always have your back.
-          </p>
+          <h3 class="feature-title">Fast Listings</h3>
+          <p  class="feature-desc">Post your account in minutes and start receiving offers immediately from interested buyers.</p>
         </article>
-
-        <!-- Card 4 -->
         <article class="feature-card reveal reveal-delay-3">
           <div class="feature-icon" aria-hidden="true">🎯</div>
           <h3 class="feature-title">Easy to Use</h3>
-          <p class="feature-desc">
-            A clean, intuitive interface means you can browse, buy, and sell without any friction — on desktop or mobile.
-          </p>
+          <p  class="feature-desc">A clean, intuitive interface that makes browsing, chatting, and selling smooth on both mobile and desktop.</p>
         </article>
+      </div>
 
+      <!-- Safety note -->
+      <div class="text-center" style="margin-top:36px;">
+        <p style="font-size:.82rem;color:var(--text-muted);max-width:520px;margin:0 auto;line-height:1.7;padding:12px 20px;border:1px solid rgba(255,255,255,0.08);border-radius:10px;background:rgba(255,255,255,0.03);">
+          ⚠️ Always ensure safe transactions and verify details before completing any deal.
+        </p>
       </div>
     </div>
   </section>
 
   <div class="section-divider"></div>
 
-  <!-- ============================================================
-       HOW IT WORKS
-  ============================================================ -->
+  <!-- TC COIN SECTION -->
+  <section class="section tccoin-section" id="tc-coin" aria-labelledby="tccoin-title">
+    <div class="section-inner">
+      <div class="tccoin-grid">
+        <div>
+          <p class="section-tag" data-i18n="tccoin.tag">Platform Currency</p>
+          <h2 class="section-title" id="tccoin-title" data-i18n="tccoin.title">Introducing DV Coin</h2>
+          <p class="section-sub" style="max-width:480px;" data-i18n="tccoin.sub">Use DV Coin to promote your listings and boost visibility. Earn coins by posting, selling, and engaging with the community.</p>
+          <div class="tccoin-feats">
+            <div class="tc-feat">
+              <div class="tc-feat-icon">🚀</div>
+              <div>
+                <div class="tc-feat-title" data-i18n="tccoin.feat1.title">Promote Listings</div>
+                <div class="tc-feat-desc" data-i18n="tccoin.feat1.desc">Spend 5 DV Coin to feature your listing at the top of search results for 24 hours.</div>
+              </div>
+            </div>
+            <div class="tc-feat">
+              <div class="tc-feat-icon">💰</div>
+              <div>
+                <div class="tc-feat-title" data-i18n="tccoin.feat2.title">Earn by Selling</div>
+                <div class="tc-feat-desc" data-i18n="tccoin.feat2.desc">Receive DV Coin rewards automatically after each successful sale on the platform.</div>
+              </div>
+            </div>
+            <div class="tc-feat">
+              <div class="tc-feat-icon">⬆️</div>
+              <div>
+                <div class="tc-feat-title" data-i18n="tccoin.feat3.title">Level Up Faster</div>
+                <div class="tc-feat-desc" data-i18n="tccoin.feat3.desc">Higher levels unlock special badges and priority listing placement on the marketplace.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tccoin-visual reveal">
+          <div class="coin-3d">
+            <div class="coin-tc">DV</div>
+            <div class="coin-label">Coin</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- HOW IT WORKS -->
   <section class="section" id="how-it-works" aria-labelledby="hiw-title">
     <div class="section-inner">
       <div class="text-center reveal">
-        <p class="section-tag">Simple Process</p>
-        <h2 class="section-title" id="hiw-title">How It Works</h2>
-        <p class="section-sub">Three easy steps — whether you're buying or selling.</p>
+        <p class="section-tag"    data-i18n="hiw.tag">Simple Process</p>
+        <h2 class="section-title" data-i18n="hiw.title" id="hiw-title">How It Works</h2>
+        <p class="section-sub"    data-i18n="hiw.sub">Three easy steps — whether you're buying or selling.</p>
       </div>
 
       <div class="how-grid">
         <div class="how-step reveal reveal-delay-1">
           <div class="step-num">01</div>
-          <h3 class="step-title">Create Account</h3>
-          <p class="step-desc">Sign up in seconds and complete your profile to start buying or selling immediately.</p>
+          <h3 class="step-title" data-i18n="hiw.step1.title">Create Account</h3>
+          <p  class="step-desc"  data-i18n="hiw.step1.desc">Sign up in seconds and complete your profile to start buying or selling immediately.</p>
         </div>
         <div class="how-step reveal reveal-delay-2">
           <div class="step-num">02</div>
-          <h3 class="step-title">List or Browse</h3>
-          <p class="step-desc">Sellers post their accounts with details and screenshots. Buyers filter by rank, level, or price.</p>
+          <h3 class="step-title" data-i18n="hiw.step2.title">List or Browse</h3>
+          <p  class="step-desc"  data-i18n="hiw.step2.desc">Sellers post their accounts with details and screenshots. Buyers filter by category, level, or price.</p>
         </div>
         <div class="how-step reveal reveal-delay-3">
           <div class="step-num">03</div>
-          <h3 class="step-title">Safe Transfer</h3>
-          <p class="step-desc">Payment is held securely. Seller transfers the account. Buyer confirms, and funds are released instantly.</p>
+          <h3 class="step-title" data-i18n="hiw.step3.title">Safe Transfer</h3>
+          <p  class="step-desc"  data-i18n="hiw.step3.desc">Payment is held securely. Seller transfers the account. Buyer confirms, and funds are released instantly.</p>
         </div>
         <div class="how-step reveal reveal-delay-4">
           <div class="step-num">04</div>
-          <h3 class="step-title">Leave a Review</h3>
-          <p class="step-desc">Help the community by rating your experience. Great sellers get featured on our platform.</p>
+          <h3 class="step-title" data-i18n="hiw.step4.title">Leave a Review</h3>
+          <p  class="step-desc"  data-i18n="hiw.step4.desc">Help the community by rating your experience. Great sellers get featured on our platform.</p>
         </div>
       </div>
     </div>
@@ -228,65 +475,58 @@
 
   <div class="section-divider"></div>
 
-  <!-- ============================================================
-       CONTACT SECTION
-  ============================================================ -->
+  <!-- CONTACT -->
   <section class="section contact-section" id="contact" aria-labelledby="contact-title">
     <div class="section-inner">
       <div class="reveal">
-        <p class="section-tag">Get in Touch</p>
-        <h2 class="section-title" id="contact-title">We'd Love to Hear From You</h2>
+        <p class="section-tag"    data-i18n="contact.tag">Get in Touch</p>
+        <h2 class="section-title" data-i18n="contact.title" id="contact-title">We'd Love to Hear From You</h2>
       </div>
 
       <div class="contact-grid">
-        <!-- Left info -->
         <div class="contact-info reveal">
-          <p>
-            Have questions about a listing, need help with a transaction, or want to report an issue?
-            Our support team is here around the clock to assist you.
-          </p>
+          <p data-i18n="contact.desc">Have questions about a listing, need help with a transaction, or want to report an issue? Our support team is here around the clock to assist you.</p>
           <div class="contact-items">
             <div class="contact-item">
               <div class="ci-icon" aria-hidden="true">📧</div>
-              <span>support@pubgvault.gg</span>
+              <span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="c0b3b5b0b0afb2b480b4a5a3a8b7a1acaca5b4eea9b1">[email&#160;protected]</a></span>
             </div>
             <div class="contact-item">
               <div class="ci-icon" aria-hidden="true">💬</div>
-              <span>Live Chat (24/7 available)</span>
+              <span data-i18n="contact.livechat">Live Chat (24/7 available)</span>
             </div>
             <div class="contact-item">
               <div class="ci-icon" aria-hidden="true">🌐</div>
-              <span>Discord Community Server</span>
+              <span data-i18n="contact.discord">Discord Community Server</span>
             </div>
             <div class="contact-item">
               <div class="ci-icon" aria-hidden="true">📱</div>
-              <span>Telegram: @PUBGVaultSupport</span>
+              <span data-i18n="contact.telegram">Telegram: @TECHWalletSupport</span>
             </div>
           </div>
         </div>
 
-        <!-- Contact form -->
         <div class="reveal reveal-delay-1">
           <form class="contact-form" id="contactForm" novalidate>
             <div class="form-row">
               <div class="form-group">
-                <label for="contactName">Name</label>
-                <input type="text" id="contactName" name="name" placeholder="Your name" required />
+                <label for="contactName" data-i18n="contact.label.name">Name</label>
+                <input type="text"  id="contactName"    name="name"    data-i18n-placeholder="contact.ph.name"    placeholder="Your name"           required />
               </div>
               <div class="form-group">
-                <label for="contactEmail">Email</label>
-                <input type="email" id="contactEmail" name="email" placeholder="you@email.com" required />
+                <label for="contactEmail" data-i18n="contact.label.email">Email</label>
+                <input type="email" id="contactEmail"   name="email"   data-i18n-placeholder="contact.ph.email"   placeholder="you@email.com"        required />
               </div>
             </div>
             <div class="form-group">
-              <label for="contactSubject">Subject</label>
-              <input type="text" id="contactSubject" name="subject" placeholder="What's this about?" />
+              <label for="contactSubject" data-i18n="contact.label.subject">Subject</label>
+              <input type="text"  id="contactSubject"  name="subject" data-i18n-placeholder="contact.ph.subject" placeholder="What's this about?" />
             </div>
             <div class="form-group">
-              <label for="contactMessage">Message</label>
-              <textarea id="contactMessage" name="message" placeholder="Tell us how we can help…" required></textarea>
+              <label for="contactMessage" data-i18n="contact.label.message">Message</label>
+              <textarea id="contactMessage" name="message" data-i18n-placeholder="contact.ph.message" placeholder="Tell us how we can help…" required></textarea>
             </div>
-            <button type="submit" class="btn btn-primary btn-submit" style="width:100%;justify-content:center;">
+            <button type="submit" class="btn btn-primary btn-submit" style="width:100%;justify-content:center;" data-i18n="contact.send">
               📨 Send Message
             </button>
           </form>
@@ -296,54 +536,50 @@
   </section>
   </main>
 
-  <!-- ============================================================
-       FOOTER
-  ============================================================ -->
+  <!-- FOOTER -->
   <footer class="footer" role="contentinfo">
     <div class="footer-inner">
       <div class="footer-top">
         <div class="footer-brand">
           <div class="nav-logo">
-            <div class="logo-icon">🎮</div>
-            PUBG<span>Vault</span>
+            <div class="logo-icon" style="font-family:'Bebas Neue',sans-serif;font-size:0.78rem;font-weight:900;letter-spacing:0.04em;">DV</div>
+            DIGI<span>VAULT</span>
           </div>
-          <p>The safest and fastest marketplace for buying and selling PUBG Mobile accounts.</p>
+          <p data-i18n="footer.tagline">The safest and fastest marketplace for buying and selling digital accounts and templates.</p>
         </div>
 
         <div class="footer-col">
-          <h4>Navigation</h4>
+          <h4 data-i18n="footer.col.nav">Navigation</h4>
           <ul>
-            <li><a href="index.html">Home</a></li>
-            <li><a href="market.html">Marketplace</a></li>
-            <li><a href="sell.html">Sell Account</a></li>
-            <li><a href="#contact">Contact</a></li>
+            <li><a href="index.html"  data-i18n="footer.home">Home</a></li>
+            <li><a href="market.html" data-i18n="footer.marketplace">Accounts</a></li>
+            <li><a href="sell.html"   data-i18n="footer.sellAccount">List Account</a></li>
+            <li><a href="#contact"    data-i18n="footer.contact">Contact</a></li>
           </ul>
         </div>
 
         <div class="footer-col">
-          <h4>Support</h4>
+          <h4 data-i18n="footer.col.support">Support</h4>
           <ul>
-            <li><a href="#">Help Center</a></li>
-            <li><a href="#">Buyer Protection</a></li>
-            <li><a href="#">Report a Scam</a></li>
-            <li><a href="#">Dispute Resolution</a></li>
+            <li><a href="#" data-i18n="footer.help">Help Center</a></li>
+            <li><a href="#" data-i18n="footer.buyerProt">Buyer Protection</a></li>
+            <li><a href="#" data-i18n="footer.reportScam">Report a Scam</a></li>
+            <li><a href="#" data-i18n="footer.dispute">Dispute Resolution</a></li>
           </ul>
         </div>
 
         <div class="footer-col">
-          <h4>Legal</h4>
+          <h4 data-i18n="footer.col.legal">Legal</h4>
           <ul>
-            <li><a href="#">Terms of Service</a></li>
-            <li><a href="#">Privacy Policy</a></li>
-            <li><a href="#">Cookie Policy</a></li>
+            <li><a href="#" data-i18n="footer.terms">Terms of Service</a></li>
+            <li><a href="#" data-i18n="footer.privacy">Privacy Policy</a></li>
+            <li><a href="#" data-i18n="footer.cookie">Cookie Policy</a></li>
           </ul>
         </div>
       </div>
 
       <div class="footer-bottom">
-        <p class="footer-copy">
-          &copy; 2025 <span>PUBGVault</span>. All rights reserved. Not affiliated with PUBG Corporation.
-        </p>
+        <p class="footer-copy" data-i18n="footer.copy">© 2025 DIGIVAULT. All rights reserved.</p>
         <div class="footer-social" aria-label="Social links">
           <a href="#" class="social-btn" aria-label="Discord">💬</a>
           <a href="#" class="social-btn" aria-label="Telegram">✈️</a>
@@ -354,6 +590,42 @@
     </div>
   </footer>
 
+  <script src="api.js"></script>
+  <script src="i18n.js"></script>
   <script src="script.js"></script>
+  <script src="global.js"></script>
+  <script src="dashboard.js"></script>
+  <script>
+    /* ── Show coin pill after all scripts load ── */
+    window.addEventListener('load', function() {
+      var user = null;
+      try { user = JSON.parse(localStorage.getItem('tw_user')); } catch(e) {}
+      if (!user) try { user = JSON.parse(null); } catch(e) {}
+      if (!user) return;
+      var pill = document.getElementById('navCoinPill');
+      var count = document.getElementById('navCoinCount');
+      if (pill) { pill.style.display = 'inline-flex'; }
+      if (count) { count.textContent = user.coins || 0; }
+    });
+  </script>
+  <script>
+    function switchTab(el, panelId) {
+      document.querySelectorAll('.dash-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.dash-panel').forEach(p => p.classList.remove('active'));
+      el.classList.add('active');
+      document.getElementById(panelId).classList.add('active');
+    }
+  </script>
+  <script>
+    /* ── Theme toggle ── */
+    (function(){
+      if(localStorage.getItem('tw_theme')==='light')
+        document.body.classList.add('light-mode');
+    })();
+    function toggleTheme(){
+      var light = document.body.classList.toggle('light-mode');
+      localStorage.setItem('tw_theme', light ? 'light' : 'dark');
+    }
+  </script>
 </body>
 </html>

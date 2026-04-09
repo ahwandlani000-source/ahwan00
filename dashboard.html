@@ -1,0 +1,135 @@
+/* ============================================================
+   dashboard.js — TECH Wallet
+   Simple dashboard overlay: name, level, TC Coins only
+   ============================================================ */
+
+var TW_Dashboard = (function () {
+
+  function getUser() {
+    try { return JSON.parse(sessionStorage.getItem('tw_user')); }
+    catch (e) { return null; }
+  }
+
+  function safe(s) {
+    return String(s || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  function build() {
+    if (document.getElementById('tw-overlay')) return;
+
+    var user = getUser();
+    var box  = document.createElement('div');
+    box.id   = 'tw-overlay';
+
+    box.style.cssText = [
+      'position:fixed',
+      'top:76px',
+      'right:20px',
+      'width:248px',
+      'background:rgba(16,5,0,0.98)',
+      'border:1.5px solid rgba(200,134,10,0.32)',
+      'border-radius:14px',
+      'overflow:hidden',
+      'z-index:9999',
+      'box-shadow:0 18px 55px rgba(0,0,0,0.72)',
+      'opacity:0',
+      'transform:translateY(-8px) scale(0.97)',
+      'pointer-events:none',
+      'transition:opacity 0.2s ease,transform 0.2s ease',
+      'font-family:DM Sans,sans-serif',
+    ].join(';');
+
+    if (user) {
+      /* ── Logged in: name + level + TC Coins ── */
+      box.innerHTML =
+        /* avatar + name */
+        '<div style="padding:16px 16px 12px;border-bottom:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;gap:11px;">' +
+          '<div style="width:40px;height:40px;border-radius:50%;background:rgba(200,134,10,0.14);border:1.5px solid rgba(200,134,10,0.32);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">&#128100;</div>' +
+          '<div style="min-width:0;">' +
+            '<div style="font-weight:700;font-size:0.88rem;color:#f5ecd7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + safe(user.name) + '</div>' +
+            '<div style="font-size:0.68rem;color:#b09070;margin-top:2px;">&#127942; Gold Seller</div>' +
+          '</div>' +
+        '</div>' +
+        /* level + TC Coins */
+        '<div style="padding:12px 14px 14px;display:flex;gap:8px;">' +
+          '<div style="flex:1;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:9px;padding:10px 6px;text-align:center;">' +
+            '<div style="font-size:0.52rem;color:#b09070;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px;">Level</div>' +
+            '<div style="font-size:0.95rem;font-weight:700;color:#f5ecd7;">' + safe(user.level || 'Gold') + '</div>' +
+          '</div>' +
+          '<div style="flex:1;background:rgba(200,134,10,0.09);border:1px solid rgba(200,134,10,0.22);border-radius:9px;padding:10px 6px;text-align:center;">' +
+            '<div style="font-size:0.52rem;color:#b09070;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px;">TC Coins</div>' +
+            '<div style="font-size:0.95rem;font-weight:700;color:#c8860a;">&#129521; ' + (user.coins || 125) + '</div>' +
+          '</div>' +
+        '</div>' +
+        /* subtle link to full account */
+        '<div style="padding:0 14px 14px;">' +
+          '<a href="account.html" style="display:block;text-align:center;background:#c8860a;color:#1a0a00;border-radius:9px;padding:10px;font-weight:700;font-size:0.82rem;text-decoration:none;">My Account &#8594;</a>' +
+        '</div>';
+    } else {
+      /* ── Not logged in ── */
+      box.innerHTML =
+        '<div style="padding:24px 18px 18px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.07);">' +
+          '<div style="font-size:2.4rem;margin-bottom:8px;">&#128100;</div>' +
+          '<div style="font-weight:700;font-size:0.9rem;color:#f5ecd7;margin-bottom:5px;">Not signed in</div>' +
+          '<div style="font-size:0.75rem;color:#b09070;line-height:1.6;">Login to see your level and TC Coins.</div>' +
+        '</div>' +
+        '<div style="padding:14px;display:flex;flex-direction:column;gap:7px;">' +
+          '<a href="login.html" style="display:block;text-align:center;background:#c8860a;color:#1a0a00;border-radius:9px;padding:11px;font-weight:700;font-size:0.84rem;text-decoration:none;">Sign In &#8594;</a>' +
+          '<a href="login.html" style="display:block;text-align:center;background:transparent;border:1.5px solid rgba(200,134,10,0.26);color:#b09070;border-radius:9px;padding:10px;font-size:0.8rem;text-decoration:none;font-weight:600;">Create Account</a>' +
+        '</div>';
+    }
+
+    document.body.appendChild(box);
+
+    document.addEventListener('click', function (e) {
+      var overlay = document.getElementById('tw-overlay');
+      var btn     = document.getElementById('tw-dash-btn');
+      if (!overlay) return;
+      if (btn     && btn.contains(e.target))     return;
+      if (overlay && overlay.contains(e.target)) return;
+      TW_Dashboard.close();
+    });
+  }
+
+  return {
+    open: function () {
+      build();
+      var el = document.getElementById('tw-overlay');
+      if (!el) return;
+      el.style.opacity       = '1';
+      el.style.transform     = 'translateY(0) scale(1)';
+      el.style.pointerEvents = 'auto';
+    },
+    close: function () {
+      var el = document.getElementById('tw-overlay');
+      if (!el) return;
+      el.style.opacity       = '0';
+      el.style.transform     = 'translateY(-8px) scale(0.97)';
+      el.style.pointerEvents = 'none';
+    },
+    toggle: function () {
+      var el = document.getElementById('tw-overlay');
+      if (!el) { this.open(); return; }
+      if (el.style.pointerEvents === 'auto') { this.close(); } else { this.open(); }
+    },
+    goAccount: function () {
+      window.location.href = sessionStorage.getItem('tw_user') ? 'account.html' : 'login.html';
+    },
+    logout: function () {
+      sessionStorage.removeItem('tw_user');
+      window.location.reload();
+    },
+    init: function () { build(); }
+  };
+
+})();
+
+function toggleDashboard() { TW_Dashboard.toggle();    }
+function openAccountPage() { TW_Dashboard.goAccount(); }
+function doLogout()        { TW_Dashboard.logout();    }
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', function () { TW_Dashboard.init(); });
+} else {
+  TW_Dashboard.init();
+}
