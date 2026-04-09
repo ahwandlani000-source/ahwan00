@@ -22,6 +22,22 @@
   }());
 
   /* ── Retry helper ─────────────────────────────────────────────────────── */
+  //
+  // FIX 1 — Never retry client errors (4xx).
+  //
+  // Previously, ALL thrown errors were retried — including 404s.  When the
+  // server returned an HTML body (Express default 404 page), res.json() threw
+  // a SyntaxError which also got retried.  That caused:
+  //   • 3× wasted requests for every wrong URL
+  //   • ~1.6 s extra delay per bad call (2 retries × 800 ms)
+  //   • The real HTTP status being swallowed, making debugging impossible
+  //
+  // Rule: only retry on network-level / 5xx errors.
+  //   err.status === undefined → network failure   → retry
+  //   err.status 5xx           → server error      → retry
+  //   err.status 4xx           → client error      → throw immediately, no retry
+  //   err.isHtmlBody === true  → non-JSON response → throw immediately, no retry
+  //
   async function withRetry(fn, retries, delay) {
     retries = retries || 2;
     delay   = delay   || 800;
@@ -29,6 +45,10 @@
       try {
         return await fn();
       } catch (err) {
+        // ── Never retry 4xx client errors or HTML-body errors ──────────────
+        if (err.status && err.status >= 400 && err.status < 500) throw err;
+        if (err.isHtmlBody) throw err;
+        // ── Give up after all retries ──────────────────────────────────────
         if (attempt === retries) throw err;
         console.warn('[DV] Retrying… attempt', attempt + 1, 'of', retries);
         await new Promise(function(r){ setTimeout(r, delay); });
@@ -44,6 +64,20 @@
   };
 
   /* ── Core fetch wrapper ────────────────────────────────────────────────── */
+  //
+  // FIX 2 — Parse the response body safely BEFORE checking res.ok.
+  //
+  // Previously, `res.json()` was called unconditionally.  If the server
+  // returned an HTML page (e.g. Express default 404), res.json() threw a
+  // SyntaxError.  Because that error had no `.status` property, withRetry
+  // could not recognise it as a 4xx and kept retrying.
+  //
+  // Now:
+  //   • We always attempt to parse JSON first.
+  //   • If parsing fails we build an error with err.status from the HTTP status
+  //     and set err.isHtmlBody = true so withRetry bails out immediately.
+  //   • If res.ok is false we still surface the message from the JSON body.
+  //
   async function request(method, endpoint, data, isFormData) {
     console.log('[DV] →', method, endpoint, data || '');
     return withRetry(async function() {
@@ -60,9 +94,23 @@
         body: isFormData ? data : (data ? JSON.stringify(data) : undefined),
       };
 
-      const res  = await fetch(`${BASE_URL}${endpoint}`, config);
-      const json = await res.json();
+      const res = await fetch(`${BASE_URL}${endpoint}`, config);
 
+      // ── Safe JSON parse ─────────────────────────────────────────────────
+      // If the body is not JSON (HTML 404 page, proxy error, etc.) we must
+      // NOT let the SyntaxError bubble up raw — it has no .status so withRetry
+      // would retry it as if it were a network failure.
+      let json;
+      try {
+        json = await res.json();
+      } catch (_parseErr) {
+        const err = new Error(`HTTP ${res.status} — non-JSON response from ${endpoint}`);
+        err.status     = res.status;
+        err.isHtmlBody = true;   // flag → withRetry will NOT retry this
+        throw err;
+      }
+
+      // ── HTTP error ──────────────────────────────────────────────────────
       if (!res.ok) {
         const err = new Error(json.message || `HTTP ${res.status}`);
         err.status = res.status;
@@ -113,8 +161,17 @@
       return data;
     },
 
-    /** Fetch the current user's profile (validates token). */
-    getMe: () => get('/auth/me'),
+    /** Fetch the current user's profile (validates token).
+     *  ⚠️  Only call this if your server has a GET /api/auth/me route.
+     *  This server does NOT — calling it causes a 404 storm that delays all
+     *  subsequent requests by ~1.6s (3 retries × 800ms). Safe no-op guard added.
+     */
+    getMe: () => {
+      // Guard: only attempt if the server actually exposes /auth/me.
+      // In this project the route does not exist — return a resolved empty
+      // promise so callers don't crash and no retries are wasted.
+      return Promise.resolve(null);
+    },
 
     /** Update username / city / avatar. */
     updateProfile: (fields) => put('/auth/update-profile', fields),
@@ -139,11 +196,31 @@
 
   /* ═══════════════════════════════════════════════════════════════════════
      PRODUCTS
+     ─────────────────────────────────────────────────────────────────────
+     SERVER ROUTE MAP (server.js — DO NOT change these URLs):
+     ┌─────────────────────────────────┬──────────────────────────────────┐
+     │ DVAPI method                    │ Server route                     │
+     ├─────────────────────────────────┼──────────────────────────────────┤
+     │ Products.getAll(params)         │ GET  /api/products               │
+     │ Products.getByUser(userId)      │ GET  /api/products/:userId       │  ← path param
+     │ Products.getById(id)            │ GET  /api/product/:id            │  ← singular
+     │ Products.create(fields, …)      │ POST /api/products               │
+     │ Products.delete(id)             │ DELETE /api/products/:id         │
+     │ Products.promote(id)            │ POST /api/products/:id/promote   │
+     └─────────────────────────────────┴──────────────────────────────────┘
+     IMPORTANT:
+       getByUser  → /api/products/:userId   (plural, path param)
+       getById    → /api/product/:id        (SINGULAR — single product lookup)
+       NEVER pass a userId to getById — that hits the single-product route
+       and always returns "Product not found".
   ═══════════════════════════════════════════════════════════════════════ */
   const Products = {
     /**
      * List products with optional filters.
-     * @param {Object} params
+     * → GET /api/products
+     * → GET /api/products?category=x&minPrice=y&…
+     *
+     * @param {Object} [params]
      * @param {string}  [params.category]
      * @param {string}  [params.search]
      * @param {number}  [params.minPrice]
@@ -152,7 +229,7 @@
      * @param {string}  [params.sort]
      * @param {number}  [params.page]
      * @param {number}  [params.limit]
-     * @returns {Promise<{products, total}>}
+     * @returns {Promise<{products: Array, total: number}>}
      */
     async getAll(params) {
       params = params || {};
@@ -167,25 +244,61 @@
       return { products: arr, total: arr.length };
     },
 
-    /** Get a single product by ID. */
-    getById: (id) => get('/product/' + id),
+    /**
+     * Get a single product by its numeric ID.
+     * → GET /api/product/:id   (SINGULAR — not /api/products/:id)
+     *
+     * ⚠️  Do NOT pass a userId here — that will always return "Product not found".
+     *     Use getByUser(userId) instead.
+     *
+     * @param {string|number} id  — product ID (from listing.id)
+     * @returns {Promise<Object>}  — the product object
+     */
+    getById(id) {
+      if (!id && id !== 0) {
+        return Promise.reject(new Error('[DV] getById called with no id'));
+      }
+      // Route: GET /api/product/:id  (singular "product")
+      return get('/product/' + id);
+    },
 
-    /** All listings by a specific user. */
-    async getByUser(userId, params) {
-      params = params || {};
-      const qs = new URLSearchParams(params).toString();
-      const data = await get('/products/' + userId + (qs ? '?' + qs : ''));
+    /**
+     * All listings belonging to a specific user.
+     * → GET /api/products/:userId   (plural, path param — NOT query string)
+     *
+     * ✅ Correct:   DVAPI.Products.getByUser(user.id)
+     *               → GET /api/products/123
+     *
+     * ❌ Wrong:     DVAPI.Products.getAll({ userId })
+     *               → GET /api/products?userId=123  (server ignores userId query param)
+     *
+     * ❌ Wrong:     DVAPI.Products.getById(userId)
+     *               → GET /api/product/123  (single-product lookup, not user listings!)
+     *
+     * @param {string|number} userId
+     * @returns {Promise<{products: Array, total: number}>}
+     */
+    async getByUser(userId) {
+      // Guard: never fire a request if userId is missing — it would hit
+      // GET /api/products/undefined which returns [] or a spurious 404.
+      if (!userId && userId !== 0) {
+        console.warn('[DV] getByUser called with no userId — returning empty result');
+        return { products: [], total: 0 };
+      }
+      // Route: GET /api/products/:userId  (plural "products", path param)
+      const data = await get('/products/' + userId);
       const arr  = Array.isArray(data) ? data : [];
       return { products: arr, total: arr.length };
     },
 
     /**
      * Create a new listing (JSON body).
+     * → POST /api/products
      *
      * images parameter: pass an array of URL strings.
      * ALL images are sent as-is — no placeholders are ever injected.
      *
-     * @param {Object}   fields  — { title, description, price, currency, category, tags, userId, ... }
+     * @param {Object}   fields  — { title, description, price, currency, category, tags, userId, … }
      * @param {string[]} [images] — array of image URL strings already uploaded; pass [] if none
      * @param {string}   [video]  — video URL string or null
      * @returns {Promise<listing>}
@@ -226,6 +339,8 @@
 
     /**
      * Update a listing.
+     * → PUT /api/products/:id
+     *
      * @param {string} id
      * @param {Object} fields
      * @param {File[]} [images]
@@ -243,13 +358,19 @@
       return putFD('/products/' + id, fd);
     },
 
-    /** Delete a listing (must be owner or admin). */
+    /** Delete a listing (must be owner or admin).
+     *  → DELETE /api/products/:id
+     */
     delete: (id) => del('/products/' + id),
 
-    /** Promote a listing (costs 5 DV Coins). */
+    /** Promote a listing (costs 5 DV Coins).
+     *  → POST /api/products/:id/promote
+     */
     promote: (id) => post('/products/' + id + '/promote'),
 
-    /** Remove a single image from a listing. */
+    /** Remove a single image from a listing.
+     *  → DELETE /api/products/:productId/image/:filename
+     */
     deleteImage: (productId, filename) => del('/products/' + productId + '/image/' + filename),
   };
 

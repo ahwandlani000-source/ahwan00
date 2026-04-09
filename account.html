@@ -838,13 +838,12 @@
     container.innerHTML = '<div style="padding:24px 0;text-align:center;color:var(--text-muted);font-size:.85rem;">Loading…</div>';
 
     try {
-      /* ── 3. Call backend directly with native fetch — no DVAPI dependency ── */
-      var response = await fetch('http://localhost:5001/api/products/' + user.id);
-      var data     = await response.json();
-      console.log('Listings response:', data);   // debug
-
-      /* ── 4. Backend returns a plain array — no wrapper to unwrap ── */
-      var products = Array.isArray(data) ? data : [];
+      /* ── 3. Use DVAPI.Products.getByUser → GET /api/products/:userId (path param) ──
+         Do NOT use: getAll({ userId }) → /api/products?userId=  (query param variant)
+         Do NOT use: getById(userId)    → /api/product/userId    (single product lookup!)
+      */
+      var result   = await DVAPI.Products.getByUser(user.id);
+      var products = result.products || [];
 
       if (label) label.textContent = products.length + ' listing' + (products.length !== 1 ? 's' : '') + ' total';
 
@@ -929,35 +928,13 @@
 
   /* ── Sync from backend + load listings on page ready ── */
   document.addEventListener('DOMContentLoaded', async function() {
-    var hasToken = (typeof DVAPI !== 'undefined') && DVAPI.Auth.isLoggedIn();
+    // Note: DVAPI.Auth.getMe() is intentionally NOT called here.
+    // This server has no /api/auth/me route — calling it causes 3× 404 retries
+    // (each 800ms apart) that block loadMyListings() from running promptly.
     var localUser = null;
     try { localUser = JSON.parse(localStorage.getItem('tw_user')); } catch(e) {}
 
-    if (hasToken) {
-      try {
-        var res = await DVAPI.Auth.getMe();
-        if (res && res.user && typeof TW !== 'undefined') {
-          TW.setUser({
-            name:   res.user.username,
-            email:  res.user.email,
-            city:   res.user.city  || '',
-            coins:  res.user.coins || 0,
-            level:  res.user.level || 'Bronze',
-            id:     res.user.id,
-            avatar: res.user.avatar || '👤',
-          });
-          var c = res.user.coins || 0;
-          document.getElementById('sidebarCoins').textContent = c;
-          document.getElementById('dashCoins').textContent    = c;
-          document.getElementById('coinsBalance').textContent = c;
-        }
-      } catch(err) {
-        console.error('[DV] getMe:', err);
-        if (err.status === 401 && typeof DVAPI !== 'undefined') { DVAPI.Auth.logout(); return; }
-      }
-    }
-    /* Load listings if we have any user session (token OR localStorage) */
-    if (hasToken || localUser) {
+    if (localUser) {
       loadMyListings();
     }
   });

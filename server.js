@@ -124,7 +124,7 @@ function createOne(req, res) {
     title,
     price:       Number(price),
     category,
-    userId,
+    userId:      String(userId),
     description: description || '',
     tags:        toArray(tags),
     images:      imageObjs,   // real uploaded images only — NO fake fallbacks
