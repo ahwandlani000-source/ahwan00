@@ -108,13 +108,11 @@
     .auth-or::before,.auth-or::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.08);}
     .auth-or span{font-size:.76rem;color:var(--text-muted);white-space:nowrap;}
 
-    /* Email form (revealed on click) */
+    /* Email form (always visible) */
     .email-form-wrap{
-      width:100%;max-height:0;overflow:hidden;
-      transition:max-height .4s cubic-bezier(.4,0,.2,1),opacity .3s ease;
-      opacity:0;
+      width:100%;max-height:1000px;overflow:hidden;
+      opacity:1;
     }
-    .email-form-wrap.open{max-height:460px;opacity:1;}
     .ef-group{margin-bottom:13px;}
     .ef-lbl{font-size:.69rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);display:block;margin-bottom:6px;}
     .ef-inp{
@@ -280,7 +278,7 @@
     </div>
 
     <!-- Email form (hidden until clicked) -->
-    <div class="email-form-wrap" id="emailFormWrap">
+    <div class="email-form-wrap open" id="emailFormWrap">
       <div class="auth-or"><span>Enter your details</span></div>
       <div class="auth-tabs">
         <div class="auth-tab active" onclick="switchAuth(this,'panel-signin')">Sign In</div>
